@@ -74,14 +74,12 @@
 			<img src={brantNasuha} alt="Brant Nasuha" class="w-full h-auto" />
 		</section>
 
-		<section class="footer">
+		<section class="w-[80%] footer">
 			<p class="font-caviar font-bold"><a href="/"> Art Commission Info! ₊‧°𐐪♡𐑂°‧₊</a></p>
 			<img src={catHeart} alt="Cat heart" class="w-20 h-auto mx-auto mt-2" />
-			<MusicPlayer
-				src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-				title="Portfolio Theme"
-				artist="Sillyusachi"
-			/>
+			<div class="w-full">
+				<MusicPlayer />
+			</div>
 		</section>
 	</div>
 </div>
