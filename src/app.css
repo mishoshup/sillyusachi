@@ -48,6 +48,7 @@
 @layer base {
 	body {
 		margin: 0;
+		overflow: hidden;
 		font-family:
 			Arial,
 			-apple-system,
@@ -62,4 +63,24 @@
 			sans-serif;
 		color: rgba(0, 0, 0, 0.8);
 	}
+}
+
+/* ── Keyframe animations ─────────────────────────────────────────────────── */
+
+@keyframes float {
+	0%,
+	100% {
+		transform: translateY(0px);
+	}
+	50% {
+		transform: translateY(-11px);
+	}
+}
+
+.floating-element {
+	animation: float 6s ease-in-out infinite;
+}
+
+main::-webkit-scrollbar {
+	display: none;
 }
