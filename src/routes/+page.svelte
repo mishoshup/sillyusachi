@@ -35,7 +35,11 @@
 	// ── Navigation ────────────────────────────────────────────────────────────
 	let scrollContainer: HTMLElement | undefined = $state();
 	let currentPage = $state(0);
-	const pageNames = ['portfolio', 'coming soon'];
+	let navExpanded = $state(false);
+	const pageNames = ['About Me', 'Coming Soon'];
+	const tabColors = ['#f2b8d4', '#a9c4db', '#b8d4a9', '#d4b8f2', '#a9d4c4'];
+	const tabIcons = ['✦', '♡', '⊹', '★', '˚'];
+	const tabRotations = [-1, 1.5, -0.5, 2, -1.5];
 
 	onMount(() => {
 		if (audio) {
@@ -64,8 +68,9 @@
 	});
 
 	function scrollToPage(index: number) {
-		const el = scrollContainer?.querySelector(`[data-page="${index}"]`);
-		el?.scrollIntoView({ behavior: 'smooth' });
+		if (!scrollContainer) return;
+		const el = scrollContainer.querySelector(`[data-page="${index}"]`) as HTMLElement | null;
+		if (el) scrollContainer.scrollTo({ top: el.offsetTop, behavior: 'smooth' });
 	}
 
 	// ── Music player functions ────────────────────────────────────────────────
@@ -118,7 +123,9 @@
 	}
 	function formatTime(s: number) {
 		const m = Math.floor(s / 60);
-		return `${m}:${Math.floor(s % 60).toString().padStart(2, '0')}`;
+		return `${m}:${Math.floor(s % 60)
+			.toString()
+			.padStart(2, '0')}`;
 	}
 </script>
 
@@ -132,28 +139,33 @@
 	onended={nextTrack}
 ></audio>
 
-<!-- ── Navigation dots ─────────────────────────────────────────────────────── -->
-<nav class="fixed right-5 top-1/2 -translate-y-1/2 z-50 flex flex-col items-center font-caviar">
+<!-- ── Navigation tabs ─────────────────────────────────────────────────────── -->
+<nav class="fixed left-0 top-8 z-50 flex flex-col gap-2 {navExpanded ? 'nav-expanded' : ''}">
+	<!-- Master toggle — always on top -->
+	<button
+		onclick={() => (navExpanded = !navExpanded)}
+		aria-label={navExpanded ? 'Collapse navigation' : 'Expand all tabs'}
+		class="nav-toggle"
+		class:expanded={navExpanded}
+	>
+		<span class="nav-toggle-icon font-xl">✦</span>
+	</button>
+
 	{#each pageNames as name, i}
 		<button
-			onclick={() => scrollToPage(i)}
+			onclick={() => {
+				scrollToPage(i);
+				navExpanded = false;
+			}}
 			aria-label="Go to {name}"
-			class="group relative flex items-center justify-end py-3 pr-0.5"
+			class="nav-tab {i === currentPage ? 'active' : ''}"
+			style="--rot: {tabRotations[i % tabRotations.length]}deg; --bg: {tabColors[
+				i % tabColors.length
+			]};"
 		>
-			<span
-				class="absolute right-5 text-[0.62rem] text-[#3a2248]/55 whitespace-nowrap opacity-0 translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 pointer-events-none capitalize"
-			>
-				{name}
-			</span>
-			<div
-				class="w-2 h-2 rounded-full transition-all duration-300 {i === currentPage
-					? 'bg-[#a9c4db] scale-125 shadow-[0_0_8px_rgba(169,196,219,0.9),0_0_16px_rgba(169,196,219,0.4)]'
-					: 'bg-[#3a2248]/20 group-hover:bg-[#f2b8d4]/70 group-hover:scale-110'}"
-			></div>
+			<span class="tab-label">{name}</span>
+			<span class="tab-icon font-xl">{tabIcons[i % tabIcons.length]}</span>
 		</button>
-		{#if i < pageNames.length - 1}
-			<div class="w-px h-3 bg-gradient-to-b from-[#a9c4db]/25 to-[#f2b8d4]/25"></div>
-		{/if}
 	{/each}
 </nav>
 
@@ -263,7 +275,10 @@
 				{#each playlist as track, i}
 					<button
 						onclick={() => playTrack(i)}
-						class="w-full text-left px-2 py-1.5 rounded-lg flex items-center gap-2.5 hover:bg-[#a9c4db]/10 transition-colors duration-150 {i === currentTrackIndex ? 'bg-[#a9c4db]/[0.12]' : ''}"
+						class="w-full text-left px-2 py-1.5 rounded-lg flex items-center gap-2.5 hover:bg-[#a9c4db]/10 transition-colors duration-150 {i ===
+						currentTrackIndex
+							? 'bg-[#a9c4db]/[0.12]'
+							: ''}"
 					>
 						<span
 							class="w-1.5 h-1.5 rounded-full shrink-0 {i === currentTrackIndex && !isPaused
@@ -287,10 +302,14 @@
 	<!-- Mini pill -->
 	<button
 		onclick={() => (playerExpanded = !playerExpanded)}
-		class="flex items-center bg-white/72 backdrop-blur-2xl border border-white/90 rounded-full transition-all duration-500 shadow-[0_4px_24px_rgba(169,196,219,0.28)] hover:shadow-[0_6px_32px_rgba(169,196,219,0.44)] group {playerExpanded ? 'p-1.5 pr-4 gap-2.5 ring-1 ring-[#a9c4db]/35' : 'p-1'}"
+		class="flex items-center bg-white/72 backdrop-blur-2xl border border-white/90 rounded-full transition-all duration-500 shadow-[0_4px_24px_rgba(169,196,219,0.28)] hover:shadow-[0_6px_32px_rgba(169,196,219,0.44)] group {playerExpanded
+			? 'p-1.5 pr-4 gap-2.5 ring-1 ring-[#a9c4db]/35'
+			: 'p-1'}"
 	>
 		<div
-			class="w-8 h-8 rounded-full relative bg-[conic-gradient(from_0deg,#1a0f24,#4a3258_45deg,#b0a6be_90deg,#4a3258_135deg,#1a0f24_180deg,#4a3258_225deg,#b0a6be_270deg,#4a3258_315deg,#1a0f24_360deg)] shadow-[0_2px_12px_rgba(0,0,0,0.35)] shrink-0 {!isPaused ? 'animate-spin' : ''}"
+			class="w-8 h-8 rounded-full relative bg-[conic-gradient(from_0deg,#1a0f24,#4a3258_45deg,#b0a6be_90deg,#4a3258_135deg,#1a0f24_180deg,#4a3258_225deg,#b0a6be_270deg,#4a3258_315deg,#1a0f24_360deg)] shadow-[0_2px_12px_rgba(0,0,0,0.35)] shrink-0 {!isPaused
+				? 'animate-spin'
+				: ''}"
 			style={!isPaused ? 'animation-duration: 3.5s' : ''}
 		>
 			<!-- Vinyl grooves effect -->
@@ -331,7 +350,9 @@
 				<div class="flex items-end gap-[2px] h-3 ml-0.5" aria-hidden="true">
 					{#each [750, 550, 850] as delay}
 						<span
-							class="w-[2.5px] rounded-[2px] bg-gradient-to-t from-[#a9c4db] to-[#f2b8d4] transition-all duration-300 {!isPaused ? 'animate-bounce' : ''}"
+							class="w-[2.5px] rounded-[2px] bg-gradient-to-t from-[#a9c4db] to-[#f2b8d4] transition-all duration-300 {!isPaused
+								? 'animate-bounce'
+								: ''}"
 							style="height: {!isPaused ? '100%' : '35%'}; animation-duration: {delay}ms"
 						></span>
 					{/each}
@@ -367,3 +388,123 @@
 		<ComingSoon />
 	</section>
 </main>
+
+<style>
+	.nav-tab {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 6px;
+		padding: 7px 10px 7px 12px;
+		border-radius: 0 14px 14px 0;
+		border: 1px solid rgba(255, 255, 255, 0.65);
+		border-left: none;
+		background: var(--bg);
+		backdrop-filter: blur(10px);
+		transform: rotate(var(--rot)) translateX(calc(-100% + 26px));
+		transition:
+			transform 0.6s cubic-bezier(0.4, 1.5, 0.68, 1),
+			box-shadow 0.5s ease,
+			opacity 0.5s ease;
+		opacity: 0.75;
+		box-shadow: 1px 2px 4px rgba(88, 68, 108, 0.14);
+		cursor: pointer;
+	}
+	@media (hover: hover) {
+		.nav-tab:hover {
+			transform: rotate(var(--rot)) translateX(0px);
+			opacity: 1;
+			box-shadow:
+				2px 3px 6px rgba(88, 68, 108, 0.18),
+				inset 0 1px 0 rgba(255, 255, 255, 0.55);
+		}
+	}
+	.nav-tab.active {
+		transform: rotate(var(--rot)) translateX(0px);
+		opacity: 1;
+		box-shadow:
+			2px 3px 6px rgba(88, 68, 108, 0.18),
+			inset 0 1px 0 rgba(255, 255, 255, 0.55);
+	}
+	.tab-icon {
+		font-size: 0.8rem;
+		color: #3a2248;
+		line-height: 1;
+		flex-shrink: 0;
+	}
+	.tab-label {
+		font-family: var(--font-caviar);
+		font-size: 0.58rem;
+		font-weight: bold;
+		text-transform: uppercase;
+		letter-spacing: 0.13em;
+		color: #3a2248;
+		white-space: nowrap;
+		line-height: 1;
+	}
+	.nav-toggle {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 26px;
+		height: 34px;
+		border-radius: 0 13px 13px 0;
+		border: 1px solid rgba(255, 255, 255, 0.72);
+		border-left: none;
+		background: linear-gradient(160deg, #f2b8d4, #a9c4db);
+		background-size: 300% 300%;
+		animation: toggle-shimmer 5s ease infinite;
+		backdrop-filter: blur(12px);
+		transform: translateX(0);
+		opacity: 0.82;
+		box-shadow: 2px 2px 10px rgba(169, 196, 219, 0.28);
+		cursor: pointer;
+		transition:
+			opacity 0.3s ease,
+			box-shadow 0.3s ease;
+	}
+	@media (hover: hover) {
+		.nav-toggle:hover {
+			opacity: 1;
+			box-shadow:
+				3px 4px 18px rgba(169, 196, 219, 0.45),
+				inset 0 1px 0 rgba(255, 255, 255, 0.6);
+		}
+	}
+	.nav-toggle.expanded {
+		opacity: 1;
+		box-shadow:
+			3px 4px 22px rgba(242, 184, 212, 0.55),
+			0 0 14px rgba(169, 196, 219, 0.38),
+			inset 0 1px 0 rgba(255, 255, 255, 0.6);
+	}
+	@keyframes toggle-shimmer {
+		0% {
+			background-position: 0% 50%;
+		}
+		50% {
+			background-position: 100% 50%;
+		}
+		100% {
+			background-position: 0% 50%;
+		}
+	}
+	.nav-toggle-icon {
+		font-size: 1rem;
+		color: #3a2248;
+		line-height: 1;
+		display: block;
+		transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+	.nav-toggle.expanded .nav-toggle-icon {
+		transform: rotate(45deg);
+	}
+	/* Master toggle expanded — force all tabs slid out */
+	.nav-expanded .nav-tab {
+		transform: rotate(var(--rot)) translateX(0px);
+		opacity: 1;
+		box-shadow:
+			3px 3px 18px rgba(0, 0, 0, 0.13),
+			inset 0 1px 0 rgba(255, 255, 255, 0.55);
+	}
+</style>
