@@ -1,12 +1,16 @@
 <script lang="ts">
-	import catHeart from '$lib/images/cat_heart.gif';
+	import catHeartWebp from '$lib/images/cat_heart.webp';
+	import catHeartGif from '$lib/images/cat_heart.gif';
 </script>
 
 <div
 	class="relative h-full flex flex-col items-center justify-center gap-6 text-center px-8 overflow-hidden"
 >
 	<div class="relative z-10 flex flex-col items-center gap-5">
-		<img src={catHeart} alt="" class="w-16 h-auto floating-element" />
+		<picture>
+			<source srcset={catHeartWebp} type="image/webp" />
+			<img src={catHeartGif} alt="" class="w-16 h-auto floating-element" />
+		</picture>
 
 		<h2 class="font-amoria text-[clamp(2.8rem,11vw,5.5rem)] leading-none text-[#3a2248]">
 			something's<br />coming ✦

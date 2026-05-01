@@ -60,12 +60,10 @@
 	.glitter {
 		opacity: 0;
 		animation: y2k-twinkle infinite ease-in-out;
-		/* Stronger multi-layer glow */
-		text-shadow: 
+		text-shadow:
 			0 0 10px var(--glow-color),
 			0 0 20px var(--glow-color),
 			0 0 30px rgba(255, 255, 255, 0.8);
-		will-change: transform, opacity;
 	}
 
 	@keyframes y2k-twinkle {
@@ -73,14 +71,11 @@
 		100% {
 			transform: scale(0.3) rotate(-10deg);
 			opacity: 0.1;
-			filter: blur(1px);
 		}
 		50% {
 			transform: scale(1.4) rotate(180deg);
 			opacity: 1;
-			filter: blur(0px);
-			/* Pulsing glow effect */
-			text-shadow: 
+			text-shadow:
 				0 0 15px var(--glow-color),
 				0 0 30px var(--glow-color),
 				0 0 45px var(--glow-color),

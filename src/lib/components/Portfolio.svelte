@@ -1,7 +1,6 @@
 <script lang="ts">
+	import floreWebp from '$lib/images/linhas-de-flores.webp';
 	import floreGif from '$lib/images/linhas-de-flores.gif';
-	import brantNasuha from '$lib/images/brant_nasuha.jpeg';
-	import catHeart from '$lib/images/cat_heart.gif';
 	import SocialIcons from '@rodneylab/svelte-social-icons';
 	import KirkeIcon from './KirkeIcon.svelte';
 </script>
@@ -12,7 +11,15 @@
 	<!-- Content -->
 	<div class="relative z-10 flex flex-col items-center gap-4 max-w-2xl w-full">
 		<section class="header">
-			<img src={floreGif} alt="" class="w-[50%] h-auto mx-auto floating-element" />
+			<picture>
+				<source srcset={floreWebp} type="image/webp" />
+				<img
+					src={floreGif}
+					alt=""
+					fetchpriority="high"
+					class="w-[50%] h-auto mx-auto floating-element"
+				/>
+			</picture>
 		</section>
 
 		<section class="hero">
@@ -67,25 +74,7 @@
 			</div>
 		</section>
 
-		<!-- <section class="image w-full max-w-sm"> -->
-		<!-- 	<img -->
-		<!-- 		src={brantNasuha} -->
-		<!-- 		alt="Brant Nasuha" -->
-		<!-- 		class="w-full h-auto rounded-xl shadow-[0_12px_40px_rgba(169,196,219,0.28)]" -->
-		<!-- 	/> -->
-		<!-- </section> -->
-
-		<section class="w-[80%] footer">
-			<!-- <p class="font-caviar font-bold"> -->
-			<!-- 	<a href="/">Art Commission Info! ₊‧°𐐪♡𐑂°‧₊</a> -->
-			<!-- </p> -->
-			<!-- <img -->
-			<!-- 	src={catHeart} -->
-			<!-- 	alt="Cat heart" -->
-			<!-- 	class="w-20 h-auto mx-auto mt-2 floating-element" -->
-			<!-- 	style="animation-delay: 1s" -->
-			<!-- /> -->
-		</section>
+		<section class="w-[80%] footer"></section>
 	</div>
 
 	<!-- Scroll Hint -->
