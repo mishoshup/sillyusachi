@@ -2,8 +2,10 @@
 	import { onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import Portfolio from '$lib/components/Portfolio.svelte';
-	import ComingSoon from '$lib/components/ComingSoon.svelte';
 	import GlitterOverlay from '$lib/components/GlitterOverlay.svelte';
+
+	import type ComingSoonComponent from '$lib/components/ComingSoon.svelte';
+	let ComingSoon: typeof ComingSoonComponent | null = $state(null);
 	import { Play, Pause, SkipForward, SkipBack, Volume2, VolumeX } from '@lucide/svelte';
 	import Cece754 from '$lib/music/754.mp3';
 	import Roommates from '$lib/music/roommates.mp3';
@@ -44,9 +46,11 @@
 	onMount(() => {
 		if (audio) {
 			audio.volume = volume;
-			audio.src = playlist[0].src;
-			audio.load();
 		}
+
+		import('$lib/components/ComingSoon.svelte').then((mod) => {
+			ComingSoon = mod.default;
+		});
 
 		const pageEls = Array.from(
 			scrollContainer?.querySelectorAll('[data-page]') ?? []
@@ -75,18 +79,18 @@
 
 	// ── Music player functions ────────────────────────────────────────────────
 	function playTrack(index: number) {
-		if (!playlist[index]) return;
+		if (!playlist[index] || !audio) return;
 		currentTrackIndex = index;
-		if (audio) {
-			audio.src = playlist[index].src;
-			audio.load();
-			audio.play();
-			isPaused = false;
-		}
+		audio.src = playlist[index].src;
+		audio.play();
+		isPaused = false;
 	}
 
 	function togglePlay() {
 		if (!audio) return;
+		if (!audio.src) {
+			audio.src = playlist[currentTrackIndex].src;
+		}
 		if (isPaused) {
 			audio.play();
 		} else {
@@ -96,7 +100,9 @@
 	}
 
 	function handleTimeUpdate() {
-		if (audio) currentTime = audio.currentTime;
+		if (!audio) return;
+		const t = audio.currentTime;
+		if (Math.abs(t - currentTime) >= 0.25) currentTime = t;
 	}
 	function handleLoadedMetadata() {
 		if (audio) duration = audio.duration;
@@ -132,6 +138,7 @@
 <!-- Hidden audio element -->
 <audio
 	bind:this={audio}
+	preload="none"
 	ontimeupdate={handleTimeUpdate}
 	onloadedmetadata={handleLoadedMetadata}
 	onplay={() => (isPaused = false)}
@@ -140,7 +147,7 @@
 ></audio>
 
 <!-- ── Navigation tabs ─────────────────────────────────────────────────────── -->
-<nav class="fixed left-0 top-8 z-50 flex flex-col gap-2 {navExpanded ? 'nav-expanded' : ''}">
+<nav class="fixed left-0 top-8 z-50 flex flex-col gap-2 {navExpanded ? 'nav-expanded' : ''}" style="contain: layout style;">
 	<!-- Master toggle — always on top -->
 	<button
 		onclick={() => (navExpanded = !navExpanded)}
@@ -170,7 +177,7 @@
 </nav>
 
 <!-- ── Floating mini music player ─────────────────────────────────────────── -->
-<div class="fixed bottom-5 left-5 z-50 font-caviar">
+<div class="fixed bottom-5 left-5 z-50 font-caviar" style="contain: layout style;">
 	{#if playerExpanded}
 		<div
 			transition:fly={{ y: 10, duration: 200, opacity: 0 }}
@@ -385,7 +392,9 @@
 		style="scroll-snap-align: start; scroll-snap-stop: always; touch-action: pan-y;"
 	>
 		<GlitterOverlay count={15} />
-		<ComingSoon />
+		{#if ComingSoon}
+			<ComingSoon />
+		{/if}
 	</section>
 </main>
 
@@ -453,7 +462,6 @@
 		border-left: none;
 		background: linear-gradient(160deg, #f2b8d4, #a9c4db);
 		background-size: 300% 300%;
-		animation: toggle-shimmer 5s ease infinite;
 		backdrop-filter: blur(12px);
 		transform: translateX(0);
 		opacity: 0.82;
@@ -466,6 +474,7 @@
 	@media (hover: hover) {
 		.nav-toggle:hover {
 			opacity: 1;
+			animation: toggle-shimmer 5s ease infinite;
 			box-shadow:
 				3px 4px 18px rgba(169, 196, 219, 0.45),
 				inset 0 1px 0 rgba(255, 255, 255, 0.6);
@@ -473,6 +482,7 @@
 	}
 	.nav-toggle.expanded {
 		opacity: 1;
+		animation: toggle-shimmer 5s ease infinite;
 		box-shadow:
 			3px 4px 22px rgba(242, 184, 212, 0.55),
 			0 0 14px rgba(169, 196, 219, 0.38),
