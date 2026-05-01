@@ -28,9 +28,9 @@
 			id: i,
 			x: Math.random() * 100,
 			y: Math.random() * 100,
-			size: 0.8 + Math.random() * 1.5,
+			size: 1.2 + Math.random() * 2.5, // Made larger
 			delay: Math.random() * 5,
-			duration: 3 + Math.random() * 4,
+			duration: 2 + Math.random() * 3, // Faster twinkle
 			char: chars[Math.floor(Math.random() * chars.length)],
 			color: colors[Math.floor(Math.random() * colors.length)]
 		}));
@@ -48,6 +48,7 @@
                 animation-delay: {star.delay}s;
                 animation-duration: {star.duration}s;
                 color: {star.color};
+                --glow-color: {star.color};
             "
 		>
 			{star.char}
@@ -59,20 +60,31 @@
 	.glitter {
 		opacity: 0;
 		animation: y2k-twinkle infinite ease-in-out;
-		filter: drop-shadow(0 0 5px currentColor);
+		/* Stronger multi-layer glow */
+		text-shadow: 
+			0 0 10px var(--glow-color),
+			0 0 20px var(--glow-color),
+			0 0 30px rgba(255, 255, 255, 0.8);
 		will-change: transform, opacity;
 	}
 
 	@keyframes y2k-twinkle {
 		0%,
 		100% {
-			transform: scale(0.5) rotate(0deg);
-			opacity: 0.2;
+			transform: scale(0.3) rotate(-10deg);
+			opacity: 0.1;
+			filter: blur(1px);
 		}
 		50% {
-			transform: scale(1.2) rotate(180deg);
-			opacity: 0.9;
-			filter: drop-shadow(0 0 8px currentColor) drop-shadow(0 0 12px currentColor);
+			transform: scale(1.4) rotate(180deg);
+			opacity: 1;
+			filter: blur(0px);
+			/* Pulsing glow effect */
+			text-shadow: 
+				0 0 15px var(--glow-color),
+				0 0 30px var(--glow-color),
+				0 0 45px var(--glow-color),
+				0 0 60px rgba(255, 255, 255, 1);
 		}
 	}
 </style>
