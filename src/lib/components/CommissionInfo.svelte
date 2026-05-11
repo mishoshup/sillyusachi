@@ -14,7 +14,7 @@
 </script>
 
 <div
-	class="relative flex flex-col items-center justify-center w-full h-full py-12 px-3 sm:px-6 gap-6"
+	class="relative flex flex-col items-center justify-center w-full h-full py-12 px-3 sm:px-6 gap-6 overflow-y-auto"
 >
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-5xl">
 		<!-- 1. Header — full width -->

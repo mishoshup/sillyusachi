@@ -368,13 +368,13 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 <main
 	bind:this={scrollContainer}
 	class="h-[100dvh] w-full overflow-y-auto"
-	style="scroll-snap-type: y proximity; scrollbar-width: none; -ms-overflow-style: none; touch-action: pan-y;"
+	style="scroll-snap-type: y mandatory; scrollbar-width: none; -ms-overflow-style: none; touch-action: pan-y;"
 >
 	<!-- Page 0: Portfolio -->
 	<section
 		data-page="0"
-		class="min-h-[100dvh] w-full relative"
-		style="scroll-snap-align: start; touch-action: pan-y;"
+		class="h-[100dvh] w-full relative"
+		style="scroll-snap-align: start; scroll-snap-stop: always; touch-action: pan-y;"
 		tabindex="0"
 		role="region"
 		aria-label="Portfolio"
@@ -386,8 +386,8 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 	<!-- Page 1: Commissions -->
 	<section
 		data-page="1"
-		class="min-h-[100dvh] w-full relative"
-		style="scroll-snap-align: start; touch-action: pan-y;"
+		class="h-[100dvh] w-full relative"
+		style="scroll-snap-align: start; scroll-snap-stop: always; touch-action: pan-y;"
 		tabindex="0"
 		role="region"
 		aria-label="Commissions"
@@ -399,8 +399,8 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 	<!-- Page 2: About Me -->
 	<section
 		data-page="2"
-		class="min-h-[100dvh] w-full relative"
-		style="scroll-snap-align: start; touch-action: pan-y;"
+		class="h-[100dvh] w-full relative"
+		style="scroll-snap-align: start; scroll-snap-stop: always; touch-action: pan-y;"
 		tabindex="0"
 		role="region"
 		aria-label="About Me"
