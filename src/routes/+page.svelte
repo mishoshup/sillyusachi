@@ -39,7 +39,7 @@
 	let currentPage = $state(0);
 	let navExpanded = $state(false);
 	const pageNames = ['About Me', 'Coming Soon'];
-	const tabColors = ['#f2b8d4', '#a9c4db', '#b8d4a9', '#d4b8f2', '#a9d4c4'];
+	const tabColors = ['#1a3a5c', '#2a4a6c', '#3a5a7c', '#7ba7c9', '#5a8ab5'];  // Voyager blues
 	const tabIcons = ['✦', '♡', '⊹', '★', '˚'];
 	const tabRotations = [-1, 1.5, -0.5, 2, -1.5];
 
@@ -181,14 +181,14 @@
 	{#if playerExpanded}
 		<div
 			transition:fly={{ y: 10, duration: 200, opacity: 0 }}
-			class="mb-2 bg-white/72 backdrop-blur-2xl border border-white/90 rounded-2xl p-4 w-64 shadow-[0_8px_40px_rgba(169,196,219,0.32),0_2px_12px_rgba(242,184,212,0.18)]"
+			class="mb-2 bg-[#080612]/60 backdrop-blur-2xl border border-white/10 rounded-2xl p-4 w-64 shadow-[0_8px_40px_rgba(212,168,83,0.10),0_2px_12px_rgba(123,167,201,0.12)]"
 		>
 			<!-- Track info -->
 			<div class="mb-3">
-				<div class="font-amoria text-[1.05rem] leading-snug text-[#3a2248]">
+				<div class="font-amoria text-[1.05rem] leading-snug text-[#f0eae8]">
 					{playlist[currentTrackIndex]?.name ?? 'No track'}
 				</div>
-				<div class="text-[0.6rem] font-bold uppercase tracking-[0.08em] text-[#7c6a8e] mt-0.5">
+				<div class="text-[0.6rem] font-bold uppercase tracking-[0.08em] text-[#8899aa] mt-0.5">
 					{playlist[currentTrackIndex]?.artist ?? ''}
 					{#if playlist[currentTrackIndex]?.album}
 						· {playlist[currentTrackIndex].album}
@@ -200,10 +200,10 @@
 			<div class="mb-3">
 				<div class="relative h-4 flex items-center">
 					<div
-						class="absolute inset-x-0 h-[4px] bg-[#a9c4db]/20 rounded-full pointer-events-none"
+						class="absolute inset-x-0 h-[4px] bg-white/10 rounded-full pointer-events-none"
 					></div>
 					<div
-						class="absolute left-0 h-[4px] bg-gradient-to-r from-[#a9c4db] to-[#f2b8d4] rounded-full pointer-events-none max-w-full transition-[width] duration-100"
+						class="absolute left-0 h-[4px] bg-gradient-to-r from-[#d4a853] to-[#7ba7c9] rounded-full pointer-events-none max-w-full transition-[width] duration-100"
 						style="width: {progress}%"
 					></div>
 					<input
@@ -216,7 +216,7 @@
 						class="absolute inset-0 w-full opacity-0 cursor-pointer"
 					/>
 				</div>
-				<div class="flex justify-between text-[0.56rem] text-[#b0a6be] mt-1">
+				<div class="flex justify-between text-[0.56rem] text-[#8899aa] mt-1">
 					<span>{formatTime(currentTime)}</span>
 					<span>{formatTime(duration)}</span>
 				</div>
@@ -226,14 +226,14 @@
 			<div class="flex items-center justify-center gap-3 mb-3">
 				<button
 					onclick={prevTrack}
-					class="text-[#b0a6be] hover:text-[#a9c4db] transition-colors p-1"
+					class="text-[#8899aa] hover:text-[#7ba7c9] transition-colors p-1"
 					aria-label="Previous"
 				>
 					<SkipBack size={14} />
 				</button>
 				<button
 					onclick={togglePlay}
-					class="w-9 h-9 rounded-full bg-gradient-to-br from-[#a9c4db] to-[#c8daeb] text-white flex items-center justify-center shadow-[0_3px_12px_rgba(169,196,219,0.55)] hover:scale-110 active:scale-95 transition-all duration-200"
+					class="w-9 h-9 rounded-full bg-gradient-to-br from-[#d4a853] to-[#b8953a] text-white flex items-center justify-center shadow-[0_3px_12px_rgba(212,168,83,0.4)] hover:scale-110 active:scale-95 transition-all duration-200"
 					aria-label={isPaused ? 'Play' : 'Pause'}
 				>
 					{#if isPaused}
@@ -244,7 +244,7 @@
 				</button>
 				<button
 					onclick={nextTrack}
-					class="text-[#b0a6be] hover:text-[#a9c4db] transition-colors p-1"
+					class="text-[#8899aa] hover:text-[#7ba7c9] transition-colors p-1"
 					aria-label="Next"
 				>
 					<SkipForward size={14} />
@@ -252,7 +252,7 @@
 				<div class="ml-auto hidden sm:flex items-center gap-1">
 					<button
 						onclick={toggleMute}
-						class="text-[#b0a6be] hover:text-[#a9c4db] transition-colors p-1"
+						class="text-[#8899aa] hover:text-[#7ba7c9] transition-colors p-1"
 						aria-label={isMuted ? 'Unmute' : 'Mute'}
 					>
 						{#if isMuted}
@@ -268,35 +268,35 @@
 						step="0.01"
 						value={volume}
 						oninput={handleVolumeChange}
-						class="w-14 accent-[#a9c4db] cursor-pointer"
+						class="w-14 accent-[#d4a853] cursor-pointer"
 						aria-label="Volume"
 					/>
 				</div>
 			</div>
 
 			<!-- Playlist -->
-			<div class="border-t border-[#a9c4db]/20 pt-2">
-				<div class="text-[0.58rem] font-bold uppercase tracking-[0.09em] text-[#b0a6be] mb-1.5">
+			<div class="border-t border-white/10 pt-2">
+				<div class="text-[0.58rem] font-bold uppercase tracking-[0.09em] text-[#8899aa] mb-1.5">
 					playlist
 				</div>
 				{#each playlist as track, i}
 					<button
 						onclick={() => playTrack(i)}
-						class="w-full text-left px-2 py-1.5 rounded-lg flex items-center gap-2.5 hover:bg-[#a9c4db]/10 transition-colors duration-150 {i ===
+						class="w-full text-left px-2 py-1.5 rounded-lg flex items-center gap-2.5 hover:bg-[#1a3a5c]/30 transition-colors duration-150 {i ===
 						currentTrackIndex
-							? 'bg-[#a9c4db]/[0.12]'
+							? 'bg-[#1a3a5c]/50 shadow-[inset_0_0_0_1px_rgba(212,168,83,0.15)]'
 							: ''}"
 					>
 						<span
 							class="w-1.5 h-1.5 rounded-full shrink-0 {i === currentTrackIndex && !isPaused
-								? 'bg-[#a9c4db] animate-pulse shadow-[0_0_5px_rgba(169,196,219,0.7)]'
+								? 'bg-[#d4a853] animate-pulse shadow-[0_0_5px_rgba(212,168,83,0.7)]'
 								: i === currentTrackIndex
-									? 'bg-[#a9c4db]/60'
-									: 'bg-[#a9c4db]/25'}"
+									? 'bg-[#d4a853]/60'
+									: 'bg-[#d4a853]/25'}"
 						></span>
 						<div class="min-w-0 flex-1">
-							<div class="text-[0.7rem] font-bold text-[#3a2248] truncate">{track.name}</div>
-							<div class="text-[0.56rem] text-[#b0a6be] truncate">
+							<div class="text-[0.7rem] font-bold text-[#f0eae8] truncate">{track.name}</div>
+							<div class="text-[0.56rem] text-[#8899aa] truncate">
 								{track.artist} · {track.album}
 							</div>
 						</div>
@@ -309,12 +309,12 @@
 	<!-- Mini pill -->
 	<button
 		onclick={() => (playerExpanded = !playerExpanded)}
-		class="flex items-center bg-white/72 backdrop-blur-2xl border border-white/90 rounded-full transition-all duration-500 shadow-[0_4px_24px_rgba(169,196,219,0.28)] hover:shadow-[0_6px_32px_rgba(169,196,219,0.44)] group {playerExpanded
-			? 'p-1.5 pr-4 gap-2.5 ring-1 ring-[#a9c4db]/35'
+		class="flex items-center bg-[#080612]/70 backdrop-blur-2xl border border-white/10 rounded-full transition-all duration-500 shadow-[0_4px_24px_rgba(0,0,0,0.4)] hover:shadow-[0_6px_32px_rgba(212,168,83,0.15)] group {playerExpanded
+			? 'p-1.5 pr-4 gap-2.5 ring-1 ring-[#d4a853]/30'
 			: 'p-1'}"
 	>
 		<div
-			class="w-8 h-8 rounded-full relative bg-[conic-gradient(from_0deg,#1a0f24,#4a3258_45deg,#b0a6be_90deg,#4a3258_135deg,#1a0f24_180deg,#4a3258_225deg,#b0a6be_270deg,#4a3258_315deg,#1a0f24_360deg)] shadow-[0_2px_12px_rgba(0,0,0,0.35)] shrink-0 {!isPaused
+			class="w-8 h-8 rounded-full relative bg-[conic-gradient(from_0deg,#0a0a1a,#1a3a5c_45deg,#8899aa_90deg,#1a3a5c_135deg,#0a0a1a_180deg,#1a3a5c_225deg,#8899aa_270deg,#1a3a5c_315deg,#0a0a1a_360deg)] shadow-[0_2px_12px_rgba(0,0,0,0.5)] shrink-0 {!isPaused
 				? 'animate-spin'
 				: ''}"
 			style={!isPaused ? 'animation-duration: 3.5s' : ''}
@@ -336,7 +336,7 @@
 
 			<div class="absolute inset-0 flex items-center justify-center">
 				<div
-					class="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-[#f5ddee] to-[#deefef] shadow-[0_1px_3px_rgba(0,0,0,0.3)] z-10"
+					class="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-[#d4a853] to-[#b8953a] shadow-[0_1px_3px_rgba(0,0,0,0.5)] z-10"
 				></div>
 			</div>
 		</div>
@@ -347,17 +347,17 @@
 				class="flex items-center gap-2.5 overflow-hidden"
 			>
 				<div class="flex flex-col min-w-0 max-w-[84px]">
-					<span class="text-[0.68rem] font-bold text-[#3a2248] truncate">
+					<span class="text-[0.68rem] font-bold text-[#f0eae8] truncate">
 						{playlist[currentTrackIndex]?.name}
 					</span>
-					<span class="text-[0.56rem] text-[#b0a6be] truncate">
+					<span class="text-[0.56rem] text-[#8899aa] truncate">
 						{playlist[currentTrackIndex]?.artist}
 					</span>
 				</div>
 				<div class="flex items-end gap-[2px] h-3 ml-0.5" aria-hidden="true">
 					{#each [750, 550, 850] as delay}
 						<span
-							class="w-[2.5px] rounded-[2px] bg-gradient-to-t from-[#a9c4db] to-[#f2b8d4] transition-all duration-300 {!isPaused
+							class="w-[2.5px] rounded-[2px] bg-gradient-to-t from-[#7ba7c9] to-[#d4a853] transition-all duration-300 {!isPaused
 								? 'animate-bounce'
 								: ''}"
 							style="height: {!isPaused ? '100%' : '35%'}; animation-duration: {delay}ms"
@@ -416,7 +416,7 @@
 			box-shadow 0.5s ease,
 			opacity 0.5s ease;
 		opacity: 0.75;
-		box-shadow: 1px 2px 4px rgba(88, 68, 108, 0.14);
+		box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.2);
 		cursor: pointer;
 	}
 	@media (hover: hover) {
@@ -424,20 +424,20 @@
 			transform: rotate(var(--rot)) translateX(0px);
 			opacity: 1;
 			box-shadow:
-				2px 3px 6px rgba(88, 68, 108, 0.18),
-				inset 0 1px 0 rgba(255, 255, 255, 0.55);
+				2px 2px 20px rgba(212, 168, 83, 0.15),
+				inset 0 1px 0 rgba(255, 255, 255, 0.35);
 		}
 	}
 	.nav-tab.active {
 		transform: rotate(var(--rot)) translateX(0px);
 		opacity: 1;
 		box-shadow:
-			2px 3px 6px rgba(88, 68, 108, 0.18),
-			inset 0 1px 0 rgba(255, 255, 255, 0.55);
+			2px 2px 20px rgba(212, 168, 83, 0.15),
+			inset 0 1px 0 rgba(255, 255, 255, 0.35);
 	}
 	.tab-icon {
 		font-size: 0.8rem;
-		color: #3a2248;
+		color: #f0eae8;
 		line-height: 1;
 		flex-shrink: 0;
 	}
@@ -447,7 +447,7 @@
 		font-weight: bold;
 		text-transform: uppercase;
 		letter-spacing: 0.13em;
-		color: #3a2248;
+		color: #f0eae8;
 		white-space: nowrap;
 		line-height: 1;
 	}
@@ -460,12 +460,12 @@
 		border-radius: 0 13px 13px 0;
 		border: 1px solid rgba(255, 255, 255, 0.72);
 		border-left: none;
-		background: linear-gradient(160deg, #f2b8d4, #a9c4db);
+		background: linear-gradient(160deg, #1a3a5c, #0a0a2a);
 		background-size: 300% 300%;
 		backdrop-filter: blur(12px);
 		transform: translateX(0);
-		opacity: 0.82;
-		box-shadow: 2px 2px 10px rgba(169, 196, 219, 0.28);
+		opacity: 0.85;
+		box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
 		cursor: pointer;
 		transition:
 			opacity 0.3s ease,
@@ -476,7 +476,7 @@
 			opacity: 1;
 			animation: toggle-shimmer 5s ease infinite;
 			box-shadow:
-				3px 4px 18px rgba(169, 196, 219, 0.45),
+				3px 4px 18px rgba(212, 168, 83, 0.25),
 				inset 0 1px 0 rgba(255, 255, 255, 0.6);
 		}
 	}
@@ -484,8 +484,8 @@
 		opacity: 1;
 		animation: toggle-shimmer 5s ease infinite;
 		box-shadow:
-			3px 4px 22px rgba(242, 184, 212, 0.55),
-			0 0 14px rgba(169, 196, 219, 0.38),
+			3px 4px 22px rgba(212, 168, 83, 0.3),
+			0 0 14px rgba(123, 167, 201, 0.25),
 			inset 0 1px 0 rgba(255, 255, 255, 0.6);
 	}
 	@keyframes toggle-shimmer {
@@ -501,7 +501,7 @@
 	}
 	.nav-toggle-icon {
 		font-size: 1rem;
-		color: #3a2248;
+		color: #f0eae8;
 		line-height: 1;
 		display: block;
 		transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);

@@ -37,7 +37,7 @@
 </svelte:head>
 
 <div
-	class="h-[100dvh] overflow-hidden bg-gradient-to-br from-[#deefef] via-[#f5ddee] to-[#e3f0e2] bg-cover bg-fixed"
+	class="h-[100dvh] overflow-hidden bg-gradient-to-br from-[#0a0a1a] via-[#0a0a2a] to-[#0d0d30] bg-cover bg-fixed"
 >
 	{@render children()}
 </div>

@@ -21,7 +21,7 @@
 
 	let stars = $state<Star[]>([]);
 	const chars = ['✦', '⊹', '˚', '✧', '⋆', '･', '｡'];
-	const colors = ['#a9c4db', '#f2b8d4', '#ffffff', '#deefef', '#deefef'];
+	const colors = ['#ffffff', '#7ba7c9', '#d4a853'];
 
 	onMount(() => {
 		stars = Array.from({ length: count }).map((_, i) => ({
@@ -30,7 +30,7 @@
 			y: Math.random() * 100,
 			size: 1.2 + Math.random() * 2.5, // Made larger
 			delay: Math.random() * 5,
-			duration: 2 + Math.random() * 3, // Faster twinkle
+			duration: 4 + Math.random() * 2, // Ethereal twinkle
 			char: chars[Math.floor(Math.random() * chars.length)],
 			color: colors[Math.floor(Math.random() * colors.length)]
 		}));
