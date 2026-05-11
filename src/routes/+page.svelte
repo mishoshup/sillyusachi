@@ -442,6 +442,7 @@
 		}
 	}
 	.nav-tab.active {
+		transform: rotate(var(--rot)) translateX(0px);
 		opacity: 1;
 		box-shadow:
 			2px 2px 20px rgba(212, 168, 83, 0.15),
