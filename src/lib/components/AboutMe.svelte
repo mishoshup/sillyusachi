@@ -28,27 +28,31 @@
 	let ageDescriptor = $derived(`${age} · celestial traveler`);
 </script>
 
-<div class="h-full w-full flex items-center justify-center p-4">
-	<div
-		class="max-w-[600px] w-full bg-white/[0.04] backdrop-blur-md border border-white/[0.08] rounded-2xl shadow-[0_0_20px_rgba(212,168,83,0.08)] p-6 md:p-8"
-	>
-		<!-- Header -->
-		<div class="text-center mb-6">
-			<h2 class="font-amoria gold-gradient-text text-[2.5rem] md:text-[3rem] leading-none">
-				{name}
-			</h2>
-			<p class="font-caviar text-[#8899aa] text-sm mt-1">{subtitle}</p>
-		</div>
+<div class="relative flex flex-col items-center justify-center w-full h-full py-8 sm:py-12 px-4 sm:px-8 gap-6 overflow-hidden">
+	<!-- Header + Quote in a top section -->
+	<div class="text-center z-10">
+		<h2 class="font-amoria gold-gradient-text text-[2.5rem] sm:text-[3.5rem] leading-none">
+			{name}
+		</h2>
+		<p class="font-caviar text-[#8899aa] text-sm mt-1">{subtitle}</p>
+	</div>
 
-		<!-- Earth Globe -->
-		<div class="flex flex-col items-center gap-2 mb-6">
+	<!-- Main content: globe + info grid side by side on desktop -->
+	<div class="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-10 w-full max-w-3xl z-10">
+		<!-- Left: Globe Column -->
+		<div class="flex flex-col items-center gap-2 shrink-0">
 			<div class="earth-globe" aria-hidden="true"></div>
 			<span class="font-caviar text-[#8899aa] text-xs">← earth — home</span>
 			<span class="font-caviar text-[#8899aa] text-sm">{location}</span>
+
+			<!-- Age descriptor below globe -->
+			<p class="font-caviar text-[#8899aa] text-[0.55rem] uppercase tracking-[0.15em] opacity-50 mt-2">
+				{ageDescriptor}
+			</p>
 		</div>
 
-		<!-- Info Grid -->
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+		<!-- Right: Info Grid -->
+		<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
 			<!-- Fav Song -->
 			<div class="bg-white/[0.04] border border-white/[0.08] rounded-xl p-3">
 				<p class="font-caviar font-bold uppercase text-[#7ba7c9] text-[0.6rem] tracking-[0.1em]">
@@ -82,9 +86,7 @@
 			</div>
 
 			<!-- My Typo (full width, gold border) -->
-			<div
-				class="md:col-span-2 bg-white/[0.04] border border-gold/[0.2] rounded-xl p-3"
-			>
+			<div class="sm:col-span-2 bg-white/[0.04] border border-gold/[0.2] rounded-xl p-3">
 				<p class="font-caviar font-bold uppercase text-[#7ba7c9] text-[0.6rem] tracking-[0.1em]">
 					My Typo™
 				</p>
@@ -92,24 +94,19 @@
 			</div>
 
 			<!-- Favourite Characters (full width) -->
-			<div class="md:col-span-2 bg-white/[0.04] border border-white/[0.08] rounded-xl p-3">
+			<div class="sm:col-span-2 bg-white/[0.04] border border-white/[0.08] rounded-xl p-3">
 				<p class="font-caviar font-bold uppercase text-[#7ba7c9] text-[0.6rem] tracking-[0.1em]">
 					Favourite Characters
 				</p>
 				<p class="font-caviar text-[#f0eae8] text-sm mt-1">{favoriteCharacters}</p>
 			</div>
 		</div>
-
-		<!-- Quote Footer -->
-		<p class="font-amoria italic text-[#8899aa] text-center mt-6">
-			"the stars incline us, they do not bind us."
-		</p>
-
-		<!-- Age descriptor (hidden decorative) -->
-		<p class="text-center font-caviar text-[#8899aa] text-[0.55rem] mt-3 uppercase tracking-[0.15em] opacity-50">
-			{ageDescriptor}
-		</p>
 	</div>
+
+	<!-- Quote Footer -->
+	<p class="font-amoria italic text-[#8899aa] text-center z-10">
+		"the stars incline us, they do not bind us."
+	</p>
 </div>
 
 <style>
