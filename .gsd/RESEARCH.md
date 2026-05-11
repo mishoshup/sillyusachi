@@ -1,10 +1,6 @@
 # Research: Sillyusachi Site — Voyager R1999 Theme Overhaul
 
-## Librarian Findings — Phase 1 & 2 (Existing)
-
-Same as original content.
-
-## Librarian Findings — Phase 3
+## Librarian Findings — Phase 1 & 2
 
 ### 1. Voyager Character Design Analysis
 
@@ -152,261 +148,6 @@ Given CONTEXT.md says "Less stars than draft — sparse, elegant" and "Colors: b
 
 **Source:** [jovianmoon.io SvelteKit Starfield](https://jovianmoon.io/posts/generating-a-starfield-in-svelte), [github.com/emmaly/starfield](https://github.com/emmaly/starfield)
 
-## Explorer Findings — Phase 3
-
-### 1. Scroll-Snap Structure (`src/routes/+page.svelte`)
-
-**Defined at module level (lines 39–44):**
-```ts
-const pageNames = ['About Me', 'Coming Soon'];
-const tabColors = ['#1a3a5c', '#2a4a6c', '#3a5a7c', '#7ba7c9', '#5a8ab5'];  // Voyager blues
-const tabIcons = ['✦', '♡', '⊹', '★', '˚'];
-const tabRotations = [-1, 1.5, -0.5, 2, -1.5];
-```
-
-**Usage in template (lines 93–109):**
-- Iterated with `{#each pageNames as name, i}`
-- Each `<button class="nav-tab">` uses `tabColors[i % tabColors.length]`, `tabRotations[i % tabRotations.length]`, and `tabIcons[i % tabIcons.length]`
-- The modulo means the color/icon/rotation arrays can be longer than page count (currently 5 entries vs 2 pages)
-
-**Key variables:**
-- `currentPage = $state(0)` — tracks active page index
-- `navExpanded = $state(false)` — master toggle for all tabs
-
-**Scroll container (line 373):** `<main class="h-[100dvh] w-full overflow-y-auto" style="scroll-snap-type: y mandatory; scrollbar-width: none;">`
-
-**Page sections (lines 380–397):**
-```svelte
-<section data-page="0" class="h-[100dvh] w-full relative" style="scroll-snap-align: start; scroll-snap-stop: always;">
-  <GlitterOverlay count={20} />
-  <Portfolio />
-</section>
-<section data-page="1" class="h-[100dvh] w-full relative" style="scroll-snap-align: start; scroll-snap-stop: always;">
-  <GlitterOverlay count={15} />
-  {#if ComingSoon}
-    <ComingSoon />
-  {/if}
-</section>
-```
-
-**IntersectionObserver (lines 56–71):**
-- Watches all `[data-page]` elements
-- Threshold: 0.6, rootMargin: none
-- Updates `currentPage` when `intersectionRatio >= 0.5`
-
-**scrollToPage function (lines 74–77):**
-- Queries `[data-page="${index}"]` and scrolls to `el.offsetTop`
-
-**REQUIRED CHANGES for Phase 3:**
-- `pageNames` → `['Portfolio', 'Commissions', 'About Me']` (3 items)
-- `tabColors` → `['#7ba7c9', '#d4a853', '#5a8ab5']` (3 items, matching proposed color scheme)
-- `tabIcons` → `['✦', '♡', '⊹']` (3 items)
-- `tabRotations` → `[-1, 1.5, -0.5]` (3 items)
-- Add third `<section data-page="2">` for About Me (moving existing Portfolio section — the old About Me page is actually the Portfolio component)
-- Add `<section data-page="1">` for Commissions between Portfolio and About Me
-- Update order: Portfolio (0) → Commissions (1) → About Me (2)
-
-### 2. Import Patterns (`+page.svelte` lines 3–11)
-
-**Static imports (always loaded):**
-```ts
-import Portfolio from '$lib/components/Portfolio.svelte';
-import GlitterOverlay from '$lib/components/GlitterOverlay.svelte';
-import { Play, Pause, SkipForward, SkipBack, Volume2, VolumeX } from '@lucide/svelte';
-```
-
-**Dynamic import (lazy-loaded):**
-```ts
-import type ComingSoonComponent from '$lib/components/ComingSoon.svelte';
-let ComingSoon: typeof ComingSoonComponent | null = $state(null);
-// in onMount:
-import('$lib/components/ComingSoon.svelte').then((mod) => { ComingSoon = mod.default; });
-```
-
-**Template usage of dynamic import:**
-```svelte
-{#if ComingSoon}
-  <svelte:component this={ComingSoon} />
-{/if}
-```
-
-**For Phase 3:** CommissionInfo should be a **static import** (the plan says it's always shown). Remove the lazy import for ComingSoon entirely. Add:
-```ts
-import CommissionInfo from '$lib/components/CommissionInfo.svelte';
-```
-
-### 3. CSS Class Patterns
-
-**Glassmorphism (used in music player, line ~218):**
-```
-bg-[#080612]/60 backdrop-blur-2xl border border-white/10 rounded-2xl
-```
-
-**Dark card glass variant:**
-```
-bg-white/[0.04] border border-white/[0.08] rounded-2xl backdrop-blur
-```
-— This is the pattern specified for CommissionInfo cards
-
-**Typography classes:**
-- `font-amoria` — elegant cursive (titles, decorative text)
-- `font-caviar` — sans-serif (body text, labels, uppercase elements)
-- `font-space` — 'Space Grotesk' (data-driven elements, specified minimal usage)
-- `font-bold`, `font-normal` for weight
-- `tracking-[0.08em]`, `tracking-[0.13em]`, `tracking-[0.18em]` — letter-spacing variants
-
-**Gold gradient pattern (Portfolio.svelte line ~18):**
-```css
-.gold-gradient-text {
-  background: linear-gradient(135deg, #f0eae8, #d4a853, #f0eae8);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-```
-
-**Button/nav hover effects:**
-- `transition-all duration-300` for smooth transitions
-- `hover:-translate-y-1 hover:drop-shadow-[0_0_8px_rgba(212,168,83,0.5)]` for gold glow on hover
-- `active:scale-95` for press feedback
-
-**Key custom CSS animations (from app.css):**
-- `.floating-element` — `@keyframes float` (translateY oscillation, 6s)
-- `@keyframes twinkle` — opacity oscillation
-- `@keyframes floatStar` — translateY + rotate
-- `@keyframes rotateEarth` — full rotation (unused currently, reserved)
-
-### 4. Responsive Design Patterns
-
-**Viewport sizing:**
-- `h-[100dvh]` — dynamic viewport height, accounts for mobile toolbars
-- `w-full` for full width
-- Scroll container: `touch-action: pan-y` — restricts touch to vertical only
-
-**Fluid typography:**
-```css
-font-size: clamp(3.5rem, 16vw, 7rem)
-font-size: clamp(2.8rem, 11vw, 5.5rem)
-```
-
-**Responsive Grid (Portfolio uses flex, not grid):**
-- Plan specifies `grid-cols-2 lg:grid-cols-3` for CommissionInfo cards, `1 column on mobile`
-- This will be the first grid layout in the project
-
-**Mobile-first padding:**
-- `px-4`, `py-8 sm:py-12` — more vertical padding on larger screens
-- `hidden sm:flex` — show elements starting from sm breakpoint
-
-**No responsive-specific JavaScript** — all responsive behavior via CSS/Tailwind
-
-### 5. Current Page Count & Expansion to 3 Pages
-
-**Current state (2 pages):**
-| Index | pageNames[i] | data-page | Component | GlitterOverlay count |
-|-------|-------------|-----------|-----------|---------------------|
-| 0 | 'About Me' | `data-page="0"` | Portfolio.svelte | 20 |
-| 1 | 'Coming Soon' | `data-page="1"` | ComingSoon.svelte (lazy) | 15 |
-
-**Target state (3 pages, reordered):**
-| Index | pageNames[i] | data-page | Component | GlitterOverlay count |
-|-------|-------------|-----------|-----------|---------------------|
-| 0 | 'Portfolio' | `data-page="0"` | Portfolio.svelte | 20 |
-| 1 | 'Commissions' | `data-page="1"` | CommissionInfo.svelte | 10 |
-| 2 | 'About Me' | `data-page="2"` | Portfolio.svelte | 15 |
-
-**Note:** The current "About Me" page IS the Portfolio.svelte component (the page shows socials, bio, etc. — it's the landing page). The Phase 3 plan renames this nav label to "Portfolio" for page 0, adds a Commissions page (new component) as page 1, and renames the existing nav label for page 2 to "About Me" (same Portfolio component shown again, or a trimmed-down About Me — the plan says wrap "Studio page with data-page=1" which might mean a separate About Me component, but the plan says to use the same scroll position approach).
-
-**Actually — re-reading the plan more carefully:**
-- Task 2 says: "Add a new `<section data-page="1">` after the Portfolio section" and "Wrap Studio page with `data-page="1"` scroll-snap attrs"
-- And `pageNames: ['Portfolio', 'Commissions', 'About Me']`
-- This means the current Portfolio component stays as page 0 (renamed "Portfolio"), a new CommissionInfo goes in page 1, and the old About Me (Portfolio component again, or a trimmed version) becomes page 2
-
-### 6. Svelte 5 Runes Patterns Across Components
-
-**$props() — component props (GlitterOverlay.svelte line 6):**
-```ts
-interface Props {
-  count?: number;
-  color?: string;
-}
-let { count = 15, color = '#a9c4db' }: Props = $props();
-```
-
-**$state() — reactive local state (multiple files):**
-```ts
-let stars = $state<Star[]>([]);  // GlitterOverlay
-let currentPage = $state(0);     // +page.svelte
-let isPaused = $state(true);     // +page.svelte
-```
-
-**$derived() — computed values (+page.svelte line 29):**
-```ts
-let progress = $derived(duration > 0 ? (currentTime / duration) * 100 : 0);
-```
-
-**{@render children()} — slot content (+layout.svelte line ~59):**
-```svelte
-{@render children()}
-```
-
-**No $effect() usage anywhere yet** — all effects handled via `onMount` from 'svelte' (Svelte 4 lifecycle, still available in Svelte 5)
-
-**TypeScript everywhere:** all `<script>` blocks use `lang="ts"`
-
-**Interface pattern for typed arrays (GlitterOverlay):**
-```ts
-type Star = {
-  id: number;
-  x: number;
-  y: number;
-  size: number;
-  delay: number;
-  duration: number;
-  char: string;
-  color: string;
-};
-```
-
-### 7. ComingSoon Component — Structure to Replace
-
-**File:** `src/lib/components/ComingSoon.svelte` (1050 bytes, 32 lines)
-
-**Imports:**
-```ts
-import catHeartWebp from '$lib/images/cat_heart.webp';
-import catHeartGif from '$lib/images/cat_heart.gif';
-```
-
-**Structure:**
-```svelte
-<div class="relative h-full flex flex-col items-center justify-center gap-6 text-center px-8 overflow-hidden">
-  <div class="relative z-10 flex flex-col items-center gap-5">
-    <picture>
-      <source srcset={catHeartWebp} type="image/webp"/>
-      <img src={catHeartGif} alt="" class="w-16 h-auto floating-element"/>
-    </picture>
-    <h2 class="font-amoria text-[clamp(2.8rem,11vw,5.5rem)] leading-none text-[#3a2248]">
-      something's<br />coming ✦
-    </h2>
-    <p class="font-amoria text-[#b0a6be] text-lg">‧₊˚ ⋅ ⊹˚. ♡</p>
-  </div>
-</div>
-```
-
-**What it's being replaced by:** CommissionInfo.svelte with full layout:
-- Header (title with gold accent)
-- Gallery placeholder card
-- Pricing card
-- Terms of Service card
-- Dos & Don'ts card (two-column mini layout)
-- Payment methods card
-- Commission Status card with pulsing green dot
-- Scroll hint at bottom
-
-**Color notes:** The ComingSoon component uses purple tones (`#3a2248`, `#b0a6be`) which contrast with the Voyager blue-gold-cream palette. CommissionInfo will use the proper Voyager palette: `#d4a853` gold, `#8899aa` muted sky-grey, `#f0eae8` cream, `#0a0a1a` deep navy background.
-
-**Images to remove from source:** The cat_heart images (`$lib/images/cat_heart.webp` and `$lib/images/cat_heart.gif`) are only used by ComingSoon and can be cleaned up after the component is removed.
-
 ### 6. Svelte 5 + Tailwind Dark Theme Best Practices
 
 **Key Setup Pattern:**
@@ -448,3 +189,365 @@ theme: {
 | Custom color palette | Extended Tailwind config | Derived from Voyager outfit descriptions |
 | Glass panels / cards | `backdrop-blur`, semi-transparent backgrounds | Tailwind native utilities |
 | Royalty-free world map | Flat earth map image for globe | Public domain — search "equirectangular world map" |
+
+---
+
+## Librarian Findings — Phase 3
+
+### 1. Artist Commission Page Best Practices
+
+**Layout & Structure (from industry research):**
+- **Above-the-fold priority:** Commission status (open/closed) is the #1 info visitors look for — place this prominently at top or in a sticky banner
+- **Clear hierarchy:** Status → Pricing → ToS → Dos/Don'ts → Contact/Payment — logical flow from "can I commission?" to "how much?" to "what are the rules?"
+- **Scan-friendly layout:** Artists' clients (often non-designers) scan before reading — use bold headings, icons, bullet lists, visual separators
+- **"One page, full info"** is the dominant pattern on VGen, Carrd, ArtStation commission tabs (i.e., don't make users click through multiple pages)
+- **Well-structured artist websites** organize into: Homepage → Portfolio → About → Contact, with commission info as a page or prominent section
+- **Digital artist portfolio checklist 2025:** Sub-2-second load, responsive, WCAG 2.2 accessibility, HTTPS, thumbnail grids that tell a story
+
+**Common Commission Page Sections (industry standard):**
+1. **Status indicator** — "● Open" / "✕ Closed" — most important signal
+2. **Pricing / Tiers** — can be flat rates, range, or "contact for quote"
+3. **Terms of Service** — payment schedule, turnaround, revisions, copyright
+4. **Dos & Don'ts** — what the artist will/won't draw
+5. **Gallery / Samples** — visual proof of quality
+6. **Payment methods** — supported platforms
+7. **How to order / Contact CTA** — clear next step
+
+**Layout Patterns from Successful Artist Sites:**
+- **Card-based information blocks** (Carrd-inspired) — each section as a visual card/panel
+- **Multi-column grid on desktop** (2-3 cols), single column on mobile
+- **Gold/cream accent** on key info (pricing, status) to draw attention
+- **Icons + emoji** for visual scanning (♡ ✦ ● etc.) — common in artist communities
+- **Subtle separators** or card gaps instead of lines
+
+**Sources:** optimize.art (artist website guide), numberanalytics.com (digital art commissions guide), artfolio.com (2025 artist portfolio checklist), ArtStation/VGen/Carrd artist page analysis
+
+### 2. Svelte 5 Card Grid Patterns with Tailwind Glassmorphism
+
+**Responsive Grid Strategy:**
+```svelte
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  {#each sections as section}
+    <Card {section} />
+  {/each}
+</div>
+```
+- `grid-cols-1` mobile → `md:grid-cols-2` tablet → `lg:grid-cols-3` desktop
+- `gap-6` (24px) gives breathing room between glass cards
+
+**Glassmorphism Card Implementation (Tailwind):**
+```svelte
+<div class="
+  bg-white/[0.04]            /* semi-transparent base */
+  border border-white/[0.08]  /* subtle glass border */
+  rounded-2xl                 /* soft corners */
+  backdrop-blur-md            /* frosted glass effect */
+  p-6
+  shadow-lg
+  hover:bg-white/[0.06]       /* subtle hover lift */
+  transition-all duration-300
+">
+  <!-- card content -->
+</div>
+```
+
+**Key Tailwind Utilities for Glassmorphism:**
+- Base opacity: `bg-white/[0.04]` or `bg-black/[0.1]` (use very low opacity — 0.04–0.08)
+- Blur levels: `backdrop-blur-sm` (8px), `backdrop-blur-md` (12px), `backdrop-blur-lg` (16px)
+- Border: `border border-white/[0.06]` to `border-white/[0.12]` — should be barely perceptible
+- Hover lift: `hover:-translate-y-0.5 hover:shadow-xl` for interactive feeling
+- Avoid `backdrop-blur` on every card if performance concerns — limit to key cards
+
+**Dark Theme Glass Tips:**
+- On dark backgrounds, use `bg-white/[0.04]` for glass (brighter glass against dark void)
+- Higher border opacity `border-white/[0.1]` helps define card edges on very dark bg
+- For gold-accented cards (like status): `border-gold/[0.15]` as accent border
+- Important: `backdrop-blur` only works when content is visible behind the element — ensure the space/starfield background is present
+
+**Performance Considerations:**
+- `backdrop-filter` is GPU-accelerated in modern browsers but heavy if overused
+- For card grids with 5+ cards, consider applying blur only to 1-2 featured cards
+- `will-change: transform` on hover elements for smooth animation
+- Test on mid-range mobile devices — blur effects can cause jank
+
+**Sources:** thesavvy.dev (glassmorphism card gallery guide), flyonui.com (Tailwind glassmorphism guide), tailkits.com (glassmorphic card component), TWColors glassmorphism recipe, Flowbite Svelte cards
+
+### 3. Commission Pricing & ToS UX
+
+**Pricing Display Patterns:**
+| Method | Best For | UX Notes |
+|--------|----------|----------|
+| Flat rate cards | Simple/small menus | Clean and scannable; use `font-space` for numbers |
+| "Contact for quote" | Variable complexity work | Include tier hints (e.g., "Full body + BG: RMXXX–RMXXX") |
+| Tiered packages | Structured services | 3 tiers max — avoid decision paralysis |
+
+**ToS Display UX (from artist community research):**
+- **50% upfront / 50% on completion** — industry standard for digital art commissions
+- **2-4 week turnaround** — typical timeline range
+- **Unlimited sketch revisions** — common offering; detailed revisions limited after sketch phase
+- **Copyright:** Artist retains copyright, client gets personal use rights — standard boilerplate
+- **AI training prohibition** — increasingly common and important clause
+- **Commercial use** — usually negotiated separately, often at higher rate
+
+**Dos & Don'ts Layout Pattern:**
+- Two-column mini layout: ✅ column + ❌ column
+- Keep each item short (1-3 words) — "OCs, Fanart, References" / "NSFW, AI Training, Commercial"
+- Use emoji for instant visual categorization — artists on VGen/Carrd universally do this
+- Consider icons alongside text for accessibility
+
+**Status Badge UX:**
+- Green dot + "● Open" — immediate positive signal
+- Pulsing dot animation draws attention — `@keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.5 } }`
+- Placement: ideally sticky somewhere visible, or at page top
+- When closed: dim/grey the page or show muted badge
+- CTA after status: "DM to discuss your idea ✦" — clear, friendly call to action
+
+**Sources:** tosexamples.carrd.co (artist TOS examples), artistsaware.com (detailed sample TOS), reddit.com/r/artbusiness (artist TOS discussions), VGen/Carrd artist page observation
+
+### 4. Accessibility for Commission Pages
+
+**Gold Text on Dark Background — Contrast Requirements:**
+- WCAG 2.1 AA requires minimum **4.5:1** for normal text, **3:1** for large text (18px+ bold or 24px+ regular)
+- `#d4a853` gold on `#0a0a1a` navy: approximate ratio ~ **5.8:1** — PASSES AA for all text sizes ✓
+- `#b8953a` brass on `#0a0a1a`: approximate ratio ~ **4.2:1** — PASSES AA for large text only (use sparingly)
+- Gold on `#1a3a5c` space blue: approximate ratio ~ **3.5:1** — fails AA for normal text, okay for large
+- **Best practice for card headings:** Use `#d4a853` gold on card bg `rgba(255,255,255,0.04)` over `#0a0a1a` — the deep navy provides sufficient contrast
+- **Avoid using gold text on mid-tone backgrounds** (space blue `#1a3a5c`)
+- **For body text** inside cards, use `#8899aa` (muted sky grey on dark card bg) — check contrast against `rgba(255,255,255,0.04)` background
+
+**Quick contrast sanity check:**
+| Text Color | Background | Ratio | Verdict |
+|-----------|-----------|-------|---------|
+| `#d4a853` gold | `#0a0a1a` navy | ~5.8:1 | ✅ AA all text |
+| `#d4a853` gold | `rgba(255,255,255,0.04)` on `#0a0a1a` | ~5.5:1 | ✅ AA all text |
+| `#f0eae8` cream | `#0a0a1a` navy | ~15:1 | ✅ Exemplary |
+| `#8899aa` sky grey | `rgba(255,255,255,0.04)` on `#0a0a1a` | ~5:1 | ✅ AA normal text |
+| `#b8953a` brass | `#0a0a1a` navy | ~4.2:1 | ⚠️ large text only |
+
+**Screen-Reader Friendly Pricing:**
+- Use semantic HTML: `<section>` with `aria-labelledby` for each pricing block
+- Pricing tables should use proper `<table>` with `<caption>` or use `<dl>` (definition list) for pairs of tier-name + price
+- Avoid relying solely on visual formatting (gold color, spacing) — ensure text labels are meaningful
+- Add `aria-label` to status badges: `<span role="status" aria-label="Commission status: open">● Open</span>`
+- Colour alone should never convey information — pair gold styling with text like "★ Featured" or text labels
+
+**Other A11y Considerations:**
+- Ensure all interactive cards have `focus-visible` outlines (don't remove `:focus` without replacement)
+- Card grid should navigate by Tab in DOM order
+- Use `font-space` (Space Grotesk) for data-heavy text — Space Grotesk has good legibility at small sizes
+- Animated elements (pulsing status dot, star twinkle) should respect `prefers-reduced-motion`
+- Minimum touch target 44×44px for mobile buttons/links
+
+**Sources:** WebAIM contrast checker, W3C WCAG 2.1 Understanding 1.4.3, MDN Web Docs color contrast guide, allaccessible.org 2025 WCAG guide
+
+### 5. Svelte 5 Reactive Patterns for Commission Page Data
+
+**When to Use Each Rune:**
+
+| Rune | Use Case | Example in Commission Page |
+|------|----------|---------------------------|
+| `$state()` | Mutable data that changes over time | `let isOpen = $state(true);` — commission status toggle |
+| `$state.raw()` | Large objects/arrays reassigned entirely | `let pricingTiers = $state.raw([...]);` — pricing data from JSON |
+| `$derived()` | Values computed from $state | `let statusColor = $derived(isOpen ? '#22c55e' : '#6b7280');` |
+| `$derived.by()` | Complex computed values | Status text, filtered pricing, layout classes |
+| `$effect()` | Side effects (avoid unless necessary) | Logging, analytics, syncing to localStorage |
+| `$props()` | Component inputs | `let { sections, status } = $props();` |
+
+**Best Practices from Svelte Docs:**
+- **Only use `$state` for variables that should be reactive** — everything else is a normal variable
+- **Use `$derived` instead of `$effect` for computed values** — avoids unnecessary effect chains
+  ```svelte
+  // ✅ GOOD
+  let statusLabel = $derived(isOpen ? 'Open' : 'Closed');
+
+  // ❌ BAD
+  let statusLabel = $state('');
+  $effect(() => { statusLabel = isOpen ? 'Open' : 'Closed'; });
+  ```
+- **`$derived` takes an expression, `$derived.by` takes a function** — use `.by` for multi-line computations
+- **`$effect` is an escape hatch** — use for syncing with external systems, not for deriving state
+- **`$props` as a single destructuring call** — treat props as if they will change
+  ```svelte
+  let { title, items, variant = 'default' }: Props = $props();
+  // use $derived for values depending on props
+  let headingClass = $derived(variant === 'featured' ? 'text-gold' : 'text-cream');
+  ```
+
+**Commission Page Reactive Architecture Pattern:**
+```svelte
+<script lang="ts">
+  // Props
+  let {
+    status: initialStatus = 'open',
+    sections = []
+  }: {
+    status: string;
+    sections: Section[];
+  } = $props();
+
+  // Derived state
+  let isOpen = $derived(initialStatus === 'open');
+  let statusColor = $derived(isOpen ? '#22c55e' : '#6b7280');
+  let statusText = $derived(isOpen ? '● Open' : '✕ Closed');
+  let statusLabel = $derived(isOpen
+    ? 'Open for commissions! DM to discuss your idea ✦'
+    : 'Commissions currently closed');
+
+  // No $effect needed for this page — everything is derived from props
+</script>
+```
+
+**Key Rule for Commission Page:** Since the commission page is a static data presentation (props/JSON in, rendered out), you likely need **zero `$effect` calls**. Everything is `$state` (if toggles needed) or `$derived` (computed display values). This aligns with Svelte's best practices.
+
+**Sources:** svelte.dev/docs/svelte/best-practices, teta.so (Svelte 5 runes complete guide), fullstacksveltekit.com (Svelte 5 runes guide), devtooleasy.com (Svelte 5 cheat sheet)
+
+### 6. Scroll-Snap Accessibility Best Practices
+
+**Scroll-Snap Layout Audit for the Voyager Site:**
+
+The scroll-snap setup (3 pages, full viewport, `scroll-snap-type: y mandatory`) has specific accessibility concerns:
+
+**Keyboard Navigation Gap:**
+- Scroll containers are NOT naturally keyboard-focusable — keyboard users Tab through interactive elements, not scroll positions
+- This means: Tab → Portfolio → (skips commission page) → About Me
+- **Fix:** Add `tabindex="0"` to each scroll-snap section so keyboard users can focus into them and use arrow keys to scroll
+
+**Implementation Pattern:**
+```svelte
+<!-- Each scroll section needs: -->
+<section
+  data-page={index}
+  tabindex="0"
+  role="region"
+  aria-label="Page {index + 1}: {pageNames[index]}"
+  class="scroll-section"
+>
+  <!-- content -->
+</section>
+```
+
+**Specific Guidelines for this Site:**
+1. **`tabindex="0"`** on each `.scroll-section` — puts sections in tab order
+2. **`role="region"` + `aria-label`** — screen reader announces "Portfolio region", "Commissions region" etc.
+3. **`aria-roledescription="scrollable section"`** — adds context for screen reader users
+4. **Visible focus styles** — `outline` or `ring` on `:focus-visible` for keyboard users (don't hide outlines)
+5. **`prefers-reduced-motion`** — respect user motion preferences; ensure scroll-snap still works but without smooth-scroll animation
+
+**Navigation Sidebar + Scroll-Snap Integration:**
+- Nav tab clicks should smoothly scroll to the corresponding section
+- When user Tabs through nav, highlight corresponding section
+- Ensure nav tabs have proper `role="tab"`, `aria-selected`, and `aria-controls` pointing to section IDs
+
+**Scroll-Snap Type Consideration:**
+- `scroll-snap-type: y mandatory` — strong snapping, always snaps to nearest section
+  - Pro: Clean UX, always on a section boundary
+  - Con: Can feel aggressive; user may struggle to stop mid-section to read long content
+- `scroll-snap-type: y proximity` — softer snapping, only snaps when close to boundary
+  - Better for reading-heavy pages (commission info has cards to read)
+  - **Recommendation:** Use `proximity` instead of `mandatory` for the commission page since users need to read content within a section
+
+**CSS Fix for Keyboard Scroll Support (from CSS-Tricks):**
+```css
+.scroll-section {
+  scroll-snap-align: start;
+  /* Ensure sections are focusable for keyboard users */
+}
+
+/* Focus indicator — MUST be visible */
+.scroll-section:focus-visible {
+  outline: 2px solid #d4a853;
+  outline-offset: -2px;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-container {
+    scroll-behavior: auto;
+  }
+}
+```
+
+**Sources:** web.dev (CSS scroll snap article), CSS-Tricks (keyboard users can't scroll overflow), W3C WAI keyboard interface practices, MDN scroll-snap docs, WebAIM tabindex best practices
+
+## Oracle Findings — Phase 3
+
+### CommissionInfo Architecture
+- **Single component** with section comments — no sub-components needed at this stage
+- **Only one prop:** `status: 'open' | 'closed'` for the commission status badge
+- All other content (pricing, ToS, DOs/DON'Ts, payment methods, header) is **static hardcoded**
+
+### Layout
+- **Grid confirmed** as correct choice: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3`
+- **Smart spanning:** ToS card should span `lg:col-span-2` (it's the most content-heavy)
+- Payment + Status cards stay compact in single columns
+
+### Scroll Integration Steps
+1. Remove ComingSoon dynamic import (`import('$lib/components/ComingSoon.svelte')`)
+2. Add static import: `import CommissionInfo from '$lib/components/CommissionInfo.svelte'`
+3. Update `pageNames` from `['About Me', 'Coming Soon']` → `['Portfolio', 'Commissions', 'About Me']`
+4. Update `tabColors` to 3 items
+5. Update `tabIcons` to 3 items
+6. Update `tabRotations` to 3 items
+7. Add `<GlitterOverlay count={10} />` to commission section
+8. Add a stub About Me section (page 2) to prevent IntersectionObserver tab-index mismatch
+
+### ⚠️ Critical Pitfalls
+1. **Tab-index mismatch** — If About Me section doesn't exist yet, tab for page 2 has no target → add a stub section immediately
+2. **IntersectionObserver flicker** — Change threshold from `0.5` to `[0.4, 0.6]` for 3 pages
+3. **`scroll-snap-stop: always`** — May feel sluggish on all 3 sections; consider `scroll-snap-stop: normal` on inner pages
+4. **tabColors reduction** — Safe because `% tabColors.length` handles it automatically
+5. **ComingSoon.svelte** — Becomes dead code; either delete or archive after Phase 3
+6. **Green status badge** — Verify `#22c55e` on `#0a0a1a` passes contrast (should be fine but check)
+7. **Scroll hint** — Direction should say "scroll down" (not "scroll to start")
+
+### Current Bug
+`pageNames = ['About Me', 'Coming Soon']` is **mislabeled** — clicking "About Me" scrolls to Portfolio. Phase 3 fix (`['Portfolio', 'Commissions', 'About Me']`) naturally resolves this.
+
+### Phase 4 Globe Asset
+Recommended: **Wikimedia equirectangular SVG** (Public Domain), styled gold-on-navy, animated via CSS `background-position` loop. More Voyager-appropriate than photorealistic NASA imagery.
+
+## Explorer Findings — Phase 3
+
+### Scroll-Snap Structure
+- Layout uses `pageNames`, `tabColors`, `tabIcons`, `tabRotations` arrays with modulo indexing in `{#each}`
+- Currently **2 pages**: page 0 = Portfolio (labeled "About Me"), page 1 = ComingSoon (labeled "Coming Soon")
+- IntersectionObserver with `0.5` threshold drives `currentPage` state (`src/routes/+page.svelte:56-69`)
+- `scroll-snap-align: start` + `scroll-snap-stop: always` on each section
+
+### Import Patterns
+- **Portfolio** and **GlitterOverlay** are static imports
+- **ComingSoon** is dynamically imported inside `onMount` via `import('$lib/components/ComingSoon.svelte')`
+- For Phase 3: CommissionInfo should be **static import** (always shown), remove lazy import + ComingSoon types
+
+### CSS Patterns
+- **Glassmorphism formula**: `bg-white/[0.04] border border-white/[0.08] rounded-2xl backdrop-blur`
+- **Font hierarchy**: `font-amoria` (titles/headers), `font-caviar` (body/labels), `font-space` (minimal)
+- **Gold gradient**: `linear-gradient(135deg, ...)` with `background-clip: text; -webkit-background-clip: text`
+- **No grid usage yet** — CommissionInfo will introduce `grid-cols-2 lg:grid-cols-3`
+
+### Svelte 5 Patterns
+- `$state()`, `$derived()`, `$props()` used consistently
+- No `$effect()` anywhere — all side effects via `onMount`
+- `{@render children()}` for slots
+
+### Responsive Design
+- Fluid `clamp()` typography: `text-[clamp(2.8rem,11vw,5.5rem)]`
+- `h-[100dvh]` for viewport sections
+- Tailwind responsive prefixes: `md:`, `lg:`
+
+### ComingSoon Replacement
+- Uses purple tones (`#3a2248`, `#b0a6be`) — doesn't match Voyager palette
+- Cat heart images (`cat_heart.webp`/`cat_heart.gif`) can be cleaned up post-removal
+
+### Summary of Phase 3 Recommendations
+
+| Topic | Key Recommendation |
+|-------|-------------------|
+| **Commission page layout** | Card-based grid, 1-col mobile → 3-col desktop, status-first hierarchy |
+| **Glass cards** | `bg-white/[0.04] backdrop-blur-md border-white/[0.08] rounded-2xl` in Tailwind |
+| **Pricing UX** | Flat rate or "contact for quote" with tier hints; clear ToS at 50/50 split |
+| **Gold contrast** | `#d4a853` on `#0a0a1a` passes AA (~5.8:1); avoid gold on mid-blue |
+| **Svelte 5 reactivity** | Use `$derived()` for computed values, avoid `$effect` — commission page is static |
+| **Scroll-snap a11y** | Add `tabindex="0"` + `aria-label` + `role="region"` to each section; prefer `proximity` over `mandatory` |
+| **Status badge** | Green pulsing dot `● Open` with gold accent card, `role="status"` for a11y |
+| **Motion safety** | Wrap animations in `@media (prefers-reduced-motion: no-preference)` |

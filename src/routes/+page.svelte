@@ -3,9 +3,7 @@
 	import { fly } from 'svelte/transition';
 	import Portfolio from '$lib/components/Portfolio.svelte';
 	import GlitterOverlay from '$lib/components/GlitterOverlay.svelte';
-
-	import type ComingSoonComponent from '$lib/components/ComingSoon.svelte';
-	let ComingSoon: typeof ComingSoonComponent | null = $state(null);
+	import CommissionInfo from '$lib/components/CommissionInfo.svelte';
 	import { Play, Pause, SkipForward, SkipBack, Volume2, VolumeX } from '@lucide/svelte';
 	import Cece754 from '$lib/music/754.mp3';
 	import Roommates from '$lib/music/roommates.mp3';
@@ -38,19 +36,15 @@
 	let scrollContainer: HTMLElement | undefined = $state();
 	let currentPage = $state(0);
 	let navExpanded = $state(false);
-	const pageNames = ['About Me', 'Coming Soon'];
-	const tabColors = ['#1a3a5c', '#2a4a6c', '#3a5a7c', '#7ba7c9', '#5a8ab5'];  // Voyager blues
-	const tabIcons = ['✦', '♡', '⊹', '★', '˚'];
-	const tabRotations = [-1, 1.5, -0.5, 2, -1.5];
+	const pageNames = ['Portfolio', 'Commissions', 'About Me'];
+	const tabColors = ['#7ba7c9', '#d4a853', '#5a8ab5'];
+	const tabIcons = ['✦', '♡', '⊹'];
+	const tabRotations = [-1, 1.5, -0.5];
 
 	onMount(() => {
 		if (audio) {
 			audio.volume = volume;
 		}
-
-		import('$lib/components/ComingSoon.svelte').then((mod) => {
-			ComingSoon = mod.default;
-		});
 
 		const pageEls = Array.from(
 			scrollContainer?.querySelectorAll('[data-page]') ?? []
@@ -64,7 +58,7 @@
 					}
 				});
 			},
-			{ threshold: 0.6, root: scrollContainer }
+			{ threshold: [0.4, 0.6], root: scrollContainer }
 		);
 
 		pageEls.forEach((el) => observer.observe(el));
@@ -375,26 +369,45 @@
 	class="h-[100dvh] w-full overflow-y-auto"
 	style="scroll-snap-type: y mandatory; scrollbar-width: none; -ms-overflow-style: none; touch-action: pan-y;"
 >
-	<!-- Page 1: Portfolio -->
+	<!-- Page 0: Portfolio -->
 	<section
 		data-page="0"
 		class="h-[100dvh] w-full relative"
 		style="scroll-snap-align: start; scroll-snap-stop: always; touch-action: pan-y;"
+		tabindex="0"
+		role="region"
+		aria-label="Portfolio"
 	>
 		<GlitterOverlay count={20} />
 		<Portfolio />
 	</section>
 
-	<!-- Page 2: Coming Soon -->
+	<!-- Page 1: Commissions -->
 	<section
 		data-page="1"
 		class="h-[100dvh] w-full relative"
 		style="scroll-snap-align: start; scroll-snap-stop: always; touch-action: pan-y;"
+		tabindex="0"
+		role="region"
+		aria-label="Commissions"
 	>
-		<GlitterOverlay count={15} />
-		{#if ComingSoon}
-			<ComingSoon />
-		{/if}
+		<GlitterOverlay count={10} />
+		<CommissionInfo status="open" />
+	</section>
+
+	<!-- Page 2: About Me -->
+	<section
+		data-page="2"
+		class="h-[100dvh] w-full relative"
+		style="scroll-snap-align: start; scroll-snap-stop: always; touch-action: pan-y;"
+		tabindex="0"
+		role="region"
+		aria-label="About Me"
+	>
+		<GlitterOverlay count={8} />
+		<div class="h-full flex items-center justify-center">
+			<p class="font-amoria text-[#8899aa] text-lg">about me coming soon ✦</p>
+		</div>
 	</section>
 </main>
 
