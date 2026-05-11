@@ -1,553 +1,726 @@
-# Research: Sillyusachi Site — Voyager R1999 Theme Overhaul
+# Research Findings
 
-## Librarian Findings — Phase 1 & 2
+## Explorer Findings — Phase 4
 
-### 1. Voyager Character Design Analysis
+### 1. Current About Me Stub Structure
 
-**Lore & Character**
-- **Name:** Voyager (远旅)
-- **Afflatus:** Star (Star Arcanist)
-- **Rarity:** 6★
-- **Role:** Support / Sub-DPS (Crit-oriented)
-- **Lore:** An alien visitor from a place where there is no "sound." Despite mastering 55 Earth languages, she communicates primarily through her violin. Expresses herself via music rather than speech.
-- **Sources:** Reverse:1999 Fandom Wiki, Prydwen Institute
+**File:** `src/routes/+page.svelte` — Lines 117-124
 
-**Outfit & Visual Design (Default)**
-- White/cream dress with dark blue/black accents
-- Frilled apron with celestial motifs
-- Juliet/puffy sleeves with cuffs
-- Hair ribbon and headband with star ornaments
-- White tights, brooches with star symbols
-- Two-tone hair (light + dark)
-- Star motifs throughout — hair accessories, brooch, fabric patterns
-- Violin as primary prop (matches her musical/alien identity)
+The About Me page is currently an inline stub within the scroll layout:
 
-**Key Visual Motifs for the Site Theme:**
-- ✦ Stars (multiple stylized variants)
-- Celestial/space backdrop (dark navy void)
-- Violin strings / musical notation as decorative elements
-- Retro-futuristic alien elegance — not overt sci-fi, but refined, mysterious
-- White/cream flowing fabrics against dark space — contrast play
-
-### 2. Reverse:1999 Art Direction & Style References
-
-**Overall Aesthetic Framework:**
-- Retro-futurism blending late 20th-century nostalgia with imagined futures
-- Surrealist and anachronistic elements — dreamlike landscapes
-- Victorian gothic undertones with steampunk touches
-- "Mysticism, retro, eccentricity, artistic, and romanticism" — core pillars
-- Mixed-media collage feel — textured backgrounds, layered compositions
-- Dark backgrounds with bright, high-contrast character art
-
-**Source:** Eagle Community character design resource
-- 161 character design illustrations available
-- Game developed by Bluepoch
-- Character design begins with extensive textual input, then art team discussions
-- Heavy use of metaphorical and symbolic elements
-
-**Source:** LogRocket on retro-futuristic UX
-- Characteristics: neon color palettes, cyber-themed typography, dark/metallic backgrounds, sci-fi imagery, immersive UI effects
-- Effective for: gaming sites, creative portfolios, personal tech blogs
-- Applied to this site: dark celestial backgrounds, gold-cyan glow effects, star particles, subtle retro-futuristic typography
-
-### 3. Voyager-Inspired Color Palette
-
-**From Voyager's Default Outfit (extracted from text descriptions and cosplay references):**
-| Color | Description | Approx. Hex |
-|-------|-------------|-------------|
-| Deep navy / near-black | Primary background (space void) | `#070714` → `#0a0a1a` |
-| Rich space blue | Mid-tone celestial blue | `#1a3a5c` |
-| Soft celestial blue | Atmospheric/nebula blue | `#5a8db0` → `#7ba7c9` |
-| Warm cream | Primary text/elements | `#f0eae8` |
-| Bright white | Star/particle highlights | `#ffffff` |
-| Antique gold | Accents, highlights, trim | `#d4a853` |
-| Dark gold / brass | Secondary accents | `#b8953a` |
-
-**Voyager-specific color associations:**
-- White dress → cream/white for UI elements, text on dark
-- Gold trim/accents → gold for decorative borders, highlights, hover effects
-- Star motifs → gold and white stars against deep blue
-- Dark blue gloves/accents → space blue tones for UI depth
-- NO purple tones — aligns with CONTEXT.md directive
-
-### 4. CSS-Only Rotating Earth Globe Techniques
-
-**Technique 1: w3bits CSS Earth (Recommended for this site)**
-- **Method:** Single `<div id="earth">` + CSS pseudo-elements
-- **Core mechanism:** Animate `background-position` of a world map image across a circular div
-```css
-#earth {
-  width: 300px; height: 300px;
-  border-radius: 50%;
-  background: url(world-map.jpg) 0 0 repeat;
-  background-size: 630px;
-  animation: rotate 4s linear infinite;
-  box-shadow: inset 20px 0 80px 6px rgba(0,0,0,1);
-  transform-style: preserve-3d;
-}
-@keyframes rotate {
-  0% { background-position: 0 0; }
-  100% { background-position: 630px 0; }
-}
-```
-- **3D illusion layers:**
-  1. `box-shadow: inset 20px 0 80px 6px rgba(0,0,0,1)` — right-side shadow
-  2. `#earth:after` — left-side shadow via `box-shadow: -80px 15px 80px 10px rgba(0,0,0,.9) inset`
-  3. `#earth:before` — spherical gradient overlay `radial-gradient(circle at 100px 100px, #fff, #000)` with `opacity: .2`
-
-- **Pros:** Pure CSS, no JS, simple to implement, lightweight
-- **Cons:** Requires a flat world map image, resolution-dependent, no true 3D
-- **Adaptation for this site:** Can be scaled down (100-150px) for the About Me page info-card
-
-**Technique 2: StackOverflow / Simple variant**
-- Same principle as w3bits but using `background-repeat: repeat` with animation
-- GitHub user Sakshigumma has a minimal implementation
-
-**Source:** [w3bits.com/css-earth/](https://w3bits.com/css-earth/), [codepen.io/jamesfinn180/pen/VwzENbR](https://codepen.io/jamesfinn180/pen/VwzENbR)
-
-### 5. Svelte 5 Particle / Starfield Implementation Patterns
-
-**Approach A: Simple CSS-Generated Stars (Lightweight, Recommended)**
-- Generate N stars using Svelte `{#each}` with randomized props
-- Style: tiny circles with `border-radius: 50%`, absolute positioned
-- Colors: white, soft blue, gold (matching Voyager palette)
-- Animation: CSS `@keyframes twinkle` for opacity oscillation
-- No canvas needed for sparse stars (CONTEXT.md specifies LESS stars, sparse & elegant)
-
-**Approach B: Canvas-Based Starfield (for performance at scale)**
-- **emmaly/starfield** — pre-built Svelte 4 component using Canvas 2D API
-- npm: `github:emmaly/starfield`
-- Props: `initialSpeed`, `initialDensity`, `maxDensity`
-- Slots for interactive speed/density controls
-- **Caution:** Built for Svelte 4 — needs migration to Svelte 5 runes API
-
-**Approach C: SVG Star Component (jovianmoon.io)**
-- Two components: `Star.svelte` (SVG star shape) + `Starfield.svelte` (generator)
-- Svelte 5 runes pattern: `$props()`, `$state()`, `$effect()`
 ```svelte
-<!-- Star.svelte pattern -->
-<script lang="ts">
-  let { size = "1rem", left = "0%", top = "0%", opacity = 1 } = $props();
-</script>
-<svg style:left style:top style:opacity ...>
-  <!-- star path -->
-</svg>
-```
-- Stars generated as arrays of `StarData[]` with `$state()` for reactivity
-- SSR-friendly — renders stars server-side before window dimensions are known
-- Uses no-overlap detection for larger stars (`check_star_positions` with distance threshold)
-
-**Recommended for This Site:**
-Given CONTEXT.md says "Less stars than draft — sparse, elegant" and "Colors: blue, white, gold only":
-- Use Approach A (CSS-generated dots) for the main starfield — simple, performant
-- Use decorative symbols ✦ ⊹ ˚ ✧ ⋆ as floating CSS-animated elements (small count, maybe 10-20)
-- Star colors: `#ffffff`, `#7ba7c9` (soft blue), `#d4a853` (gold)
-- Twinkle animation: `@keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }`
-- Size range: 1-3px for tiny stars, 4-6px for occasional larger ones
-- Gold stars should be rarest — like distant celestial bodies
-
-**Source:** [jovianmoon.io SvelteKit Starfield](https://jovianmoon.io/posts/generating-a-starfield-in-svelte), [github.com/emmaly/starfield](https://github.com/emmaly/starfield)
-
-### 6. Svelte 5 + Tailwind Dark Theme Best Practices
-
-**Key Setup Pattern:**
-```
-tailwind.config.js → darkMode: 'selector'
-```
-- Use `mode-watcher` package for theme management (`npm install mode-watcher`)
-- Add `<ModeWatcher defaultMode={"dark"} />` to root layout
-- Apply classes: `bg-white dark:bg-[#0a0a1a]` throughout
-- Svelte 5 runes: `$props()`, `$state()`, `$effect()` for component logic
-
-**Tailwind Dark Mode Selectors:**
-- `dark:` prefix on all color classes
-- For custom Voyager palette, extend Tailwind config:
-```js
-theme: {
-  extend: {
-    colors: {
-      'voyager-dark': '#0a0a1a',
-      'voyager-space': '#1a3a5c',
-      'voyager-sky': '#7ba7c9',
-      'voyager-cream': '#f0eae8',
-      'voyager-gold': '#d4a853',
-      'voyager-brass': '#b8953a',
-    }
-  }
-}
-```
-- Use `dark:bg-voyager-dark` etc. throughout components
-
-### 7. Summary of Practical References for Implementation
-
-| Feature | Technique | Reference |
-|---------|-----------|-----------|
-| Starfield background | CSS absolute-positioned dots + `@keyframes twinkle` | jovianmoon.io approach, adapted for Svelte 5 |
-| Floating decorative symbols | CSS-animated ✦ ⊹ ˚ ✧ ⋆ (10-20 elements) | Custom, inspired by Voyager star motifs |
-| CSS rotating globe | Single div + background-position animation | w3bits.com/css-earth/ |
-| Dark theme | Tailwind `darkMode: 'selector'` + mode-watcher | appmvp.dev SvelteKit guide |
-| Custom color palette | Extended Tailwind config | Derived from Voyager outfit descriptions |
-| Glass panels / cards | `backdrop-blur`, semi-transparent backgrounds | Tailwind native utilities |
-| Royalty-free world map | Flat earth map image for globe | Public domain — search "equirectangular world map" |
-
----
-
-## Librarian Findings — Phase 3
-
-### 1. Artist Commission Page Best Practices
-
-**Layout & Structure (from industry research):**
-- **Above-the-fold priority:** Commission status (open/closed) is the #1 info visitors look for — place this prominently at top or in a sticky banner
-- **Clear hierarchy:** Status → Pricing → ToS → Dos/Don'ts → Contact/Payment — logical flow from "can I commission?" to "how much?" to "what are the rules?"
-- **Scan-friendly layout:** Artists' clients (often non-designers) scan before reading — use bold headings, icons, bullet lists, visual separators
-- **"One page, full info"** is the dominant pattern on VGen, Carrd, ArtStation commission tabs (i.e., don't make users click through multiple pages)
-- **Well-structured artist websites** organize into: Homepage → Portfolio → About → Contact, with commission info as a page or prominent section
-- **Digital artist portfolio checklist 2025:** Sub-2-second load, responsive, WCAG 2.2 accessibility, HTTPS, thumbnail grids that tell a story
-
-**Common Commission Page Sections (industry standard):**
-1. **Status indicator** — "● Open" / "✕ Closed" — most important signal
-2. **Pricing / Tiers** — can be flat rates, range, or "contact for quote"
-3. **Terms of Service** — payment schedule, turnaround, revisions, copyright
-4. **Dos & Don'ts** — what the artist will/won't draw
-5. **Gallery / Samples** — visual proof of quality
-6. **Payment methods** — supported platforms
-7. **How to order / Contact CTA** — clear next step
-
-**Layout Patterns from Successful Artist Sites:**
-- **Card-based information blocks** (Carrd-inspired) — each section as a visual card/panel
-- **Multi-column grid on desktop** (2-3 cols), single column on mobile
-- **Gold/cream accent** on key info (pricing, status) to draw attention
-- **Icons + emoji** for visual scanning (♡ ✦ ● etc.) — common in artist communities
-- **Subtle separators** or card gaps instead of lines
-
-**Sources:** optimize.art (artist website guide), numberanalytics.com (digital art commissions guide), artfolio.com (2025 artist portfolio checklist), ArtStation/VGen/Carrd artist page analysis
-
-### 2. Svelte 5 Card Grid Patterns with Tailwind Glassmorphism
-
-**Responsive Grid Strategy:**
-```svelte
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-  {#each sections as section}
-    <Card {section} />
-  {/each}
-</div>
-```
-- `grid-cols-1` mobile → `md:grid-cols-2` tablet → `lg:grid-cols-3` desktop
-- `gap-6` (24px) gives breathing room between glass cards
-
-**Glassmorphism Card Implementation (Tailwind):**
-```svelte
-<div class="
-  bg-white/[0.04]            /* semi-transparent base */
-  border border-white/[0.08]  /* subtle glass border */
-  rounded-2xl                 /* soft corners */
-  backdrop-blur-md            /* frosted glass effect */
-  p-6
-  shadow-lg
-  hover:bg-white/[0.06]       /* subtle hover lift */
-  transition-all duration-300
-">
-  <!-- card content -->
-</div>
-```
-
-**Key Tailwind Utilities for Glassmorphism:**
-- Base opacity: `bg-white/[0.04]` or `bg-black/[0.1]` (use very low opacity — 0.04–0.08)
-- Blur levels: `backdrop-blur-sm` (8px), `backdrop-blur-md` (12px), `backdrop-blur-lg` (16px)
-- Border: `border border-white/[0.06]` to `border-white/[0.12]` — should be barely perceptible
-- Hover lift: `hover:-translate-y-0.5 hover:shadow-xl` for interactive feeling
-- Avoid `backdrop-blur` on every card if performance concerns — limit to key cards
-
-**Dark Theme Glass Tips:**
-- On dark backgrounds, use `bg-white/[0.04]` for glass (brighter glass against dark void)
-- Higher border opacity `border-white/[0.1]` helps define card edges on very dark bg
-- For gold-accented cards (like status): `border-gold/[0.15]` as accent border
-- Important: `backdrop-blur` only works when content is visible behind the element — ensure the space/starfield background is present
-
-**Performance Considerations:**
-- `backdrop-filter` is GPU-accelerated in modern browsers but heavy if overused
-- For card grids with 5+ cards, consider applying blur only to 1-2 featured cards
-- `will-change: transform` on hover elements for smooth animation
-- Test on mid-range mobile devices — blur effects can cause jank
-
-**Sources:** thesavvy.dev (glassmorphism card gallery guide), flyonui.com (Tailwind glassmorphism guide), tailkits.com (glassmorphic card component), TWColors glassmorphism recipe, Flowbite Svelte cards
-
-### 3. Commission Pricing & ToS UX
-
-**Pricing Display Patterns:**
-| Method | Best For | UX Notes |
-|--------|----------|----------|
-| Flat rate cards | Simple/small menus | Clean and scannable; use `font-space` for numbers |
-| "Contact for quote" | Variable complexity work | Include tier hints (e.g., "Full body + BG: RMXXX–RMXXX") |
-| Tiered packages | Structured services | 3 tiers max — avoid decision paralysis |
-
-**ToS Display UX (from artist community research):**
-- **50% upfront / 50% on completion** — industry standard for digital art commissions
-- **2-4 week turnaround** — typical timeline range
-- **Unlimited sketch revisions** — common offering; detailed revisions limited after sketch phase
-- **Copyright:** Artist retains copyright, client gets personal use rights — standard boilerplate
-- **AI training prohibition** — increasingly common and important clause
-- **Commercial use** — usually negotiated separately, often at higher rate
-
-**Dos & Don'ts Layout Pattern:**
-- Two-column mini layout: ✅ column + ❌ column
-- Keep each item short (1-3 words) — "OCs, Fanart, References" / "NSFW, AI Training, Commercial"
-- Use emoji for instant visual categorization — artists on VGen/Carrd universally do this
-- Consider icons alongside text for accessibility
-
-**Status Badge UX:**
-- Green dot + "● Open" — immediate positive signal
-- Pulsing dot animation draws attention — `@keyframes pulse { 0%, 100% { opacity: 1 } 50% { opacity: 0.5 } }`
-- Placement: ideally sticky somewhere visible, or at page top
-- When closed: dim/grey the page or show muted badge
-- CTA after status: "DM to discuss your idea ✦" — clear, friendly call to action
-
-**Sources:** tosexamples.carrd.co (artist TOS examples), artistsaware.com (detailed sample TOS), reddit.com/r/artbusiness (artist TOS discussions), VGen/Carrd artist page observation
-
-### 4. Accessibility for Commission Pages
-
-**Gold Text on Dark Background — Contrast Requirements:**
-- WCAG 2.1 AA requires minimum **4.5:1** for normal text, **3:1** for large text (18px+ bold or 24px+ regular)
-- `#d4a853` gold on `#0a0a1a` navy: approximate ratio ~ **5.8:1** — PASSES AA for all text sizes ✓
-- `#b8953a` brass on `#0a0a1a`: approximate ratio ~ **4.2:1** — PASSES AA for large text only (use sparingly)
-- Gold on `#1a3a5c` space blue: approximate ratio ~ **3.5:1** — fails AA for normal text, okay for large
-- **Best practice for card headings:** Use `#d4a853` gold on card bg `rgba(255,255,255,0.04)` over `#0a0a1a` — the deep navy provides sufficient contrast
-- **Avoid using gold text on mid-tone backgrounds** (space blue `#1a3a5c`)
-- **For body text** inside cards, use `#8899aa` (muted sky grey on dark card bg) — check contrast against `rgba(255,255,255,0.04)` background
-
-**Quick contrast sanity check:**
-| Text Color | Background | Ratio | Verdict |
-|-----------|-----------|-------|---------|
-| `#d4a853` gold | `#0a0a1a` navy | ~5.8:1 | ✅ AA all text |
-| `#d4a853` gold | `rgba(255,255,255,0.04)` on `#0a0a1a` | ~5.5:1 | ✅ AA all text |
-| `#f0eae8` cream | `#0a0a1a` navy | ~15:1 | ✅ Exemplary |
-| `#8899aa` sky grey | `rgba(255,255,255,0.04)` on `#0a0a1a` | ~5:1 | ✅ AA normal text |
-| `#b8953a` brass | `#0a0a1a` navy | ~4.2:1 | ⚠️ large text only |
-
-**Screen-Reader Friendly Pricing:**
-- Use semantic HTML: `<section>` with `aria-labelledby` for each pricing block
-- Pricing tables should use proper `<table>` with `<caption>` or use `<dl>` (definition list) for pairs of tier-name + price
-- Avoid relying solely on visual formatting (gold color, spacing) — ensure text labels are meaningful
-- Add `aria-label` to status badges: `<span role="status" aria-label="Commission status: open">● Open</span>`
-- Colour alone should never convey information — pair gold styling with text like "★ Featured" or text labels
-
-**Other A11y Considerations:**
-- Ensure all interactive cards have `focus-visible` outlines (don't remove `:focus` without replacement)
-- Card grid should navigate by Tab in DOM order
-- Use `font-space` (Space Grotesk) for data-heavy text — Space Grotesk has good legibility at small sizes
-- Animated elements (pulsing status dot, star twinkle) should respect `prefers-reduced-motion`
-- Minimum touch target 44×44px for mobile buttons/links
-
-**Sources:** WebAIM contrast checker, W3C WCAG 2.1 Understanding 1.4.3, MDN Web Docs color contrast guide, allaccessible.org 2025 WCAG guide
-
-### 5. Svelte 5 Reactive Patterns for Commission Page Data
-
-**When to Use Each Rune:**
-
-| Rune | Use Case | Example in Commission Page |
-|------|----------|---------------------------|
-| `$state()` | Mutable data that changes over time | `let isOpen = $state(true);` — commission status toggle |
-| `$state.raw()` | Large objects/arrays reassigned entirely | `let pricingTiers = $state.raw([...]);` — pricing data from JSON |
-| `$derived()` | Values computed from $state | `let statusColor = $derived(isOpen ? '#22c55e' : '#6b7280');` |
-| `$derived.by()` | Complex computed values | Status text, filtered pricing, layout classes |
-| `$effect()` | Side effects (avoid unless necessary) | Logging, analytics, syncing to localStorage |
-| `$props()` | Component inputs | `let { sections, status } = $props();` |
-
-**Best Practices from Svelte Docs:**
-- **Only use `$state` for variables that should be reactive** — everything else is a normal variable
-- **Use `$derived` instead of `$effect` for computed values** — avoids unnecessary effect chains
-  ```svelte
-  // ✅ GOOD
-  let statusLabel = $derived(isOpen ? 'Open' : 'Closed');
-
-  // ❌ BAD
-  let statusLabel = $state('');
-  $effect(() => { statusLabel = isOpen ? 'Open' : 'Closed'; });
-  ```
-- **`$derived` takes an expression, `$derived.by` takes a function** — use `.by` for multi-line computations
-- **`$effect` is an escape hatch** — use for syncing with external systems, not for deriving state
-- **`$props` as a single destructuring call** — treat props as if they will change
-  ```svelte
-  let { title, items, variant = 'default' }: Props = $props();
-  // use $derived for values depending on props
-  let headingClass = $derived(variant === 'featured' ? 'text-gold' : 'text-cream');
-  ```
-
-**Commission Page Reactive Architecture Pattern:**
-```svelte
-<script lang="ts">
-  // Props
-  let {
-    status: initialStatus = 'open',
-    sections = []
-  }: {
-    status: string;
-    sections: Section[];
-  } = $props();
-
-  // Derived state
-  let isOpen = $derived(initialStatus === 'open');
-  let statusColor = $derived(isOpen ? '#22c55e' : '#6b7280');
-  let statusText = $derived(isOpen ? '● Open' : '✕ Closed');
-  let statusLabel = $derived(isOpen
-    ? 'Open for commissions! DM to discuss your idea ✦'
-    : 'Commissions currently closed');
-
-  // No $effect needed for this page — everything is derived from props
-</script>
-```
-
-**Key Rule for Commission Page:** Since the commission page is a static data presentation (props/JSON in, rendered out), you likely need **zero `$effect` calls**. Everything is `$state` (if toggles needed) or `$derived` (computed display values). This aligns with Svelte's best practices.
-
-**Sources:** svelte.dev/docs/svelte/best-practices, teta.so (Svelte 5 runes complete guide), fullstacksveltekit.com (Svelte 5 runes guide), devtooleasy.com (Svelte 5 cheat sheet)
-
-### 6. Scroll-Snap Accessibility Best Practices
-
-**Scroll-Snap Layout Audit for the Voyager Site:**
-
-The scroll-snap setup (3 pages, full viewport, `scroll-snap-type: y mandatory`) has specific accessibility concerns:
-
-**Keyboard Navigation Gap:**
-- Scroll containers are NOT naturally keyboard-focusable — keyboard users Tab through interactive elements, not scroll positions
-- This means: Tab → Portfolio → (skips commission page) → About Me
-- **Fix:** Add `tabindex="0"` to each scroll-snap section so keyboard users can focus into them and use arrow keys to scroll
-
-**Implementation Pattern:**
-```svelte
-<!-- Each scroll section needs: -->
+<!-- Page 2: About Me -->
 <section
-  data-page={index}
-  tabindex="0"
-  role="region"
-  aria-label="Page {index + 1}: {pageNames[index]}"
-  class="scroll-section"
+    data-page="2"
+    class="h-[100dvh] w-full relative"
+    style="scroll-snap-align: start; scroll-snap-stop: always; touch-action: pan-y;"
+    tabindex="0"
+    role="region"
+    aria-label="About Me"
 >
-  <!-- content -->
+    <GlitterOverlay count={8} />
+    <div class="h-full flex items-center justify-center">
+        <p class="font-amoria text-[#8899aa] text-lg">about me coming soon ✦</p>
+    </div>
 </section>
 ```
 
-**Specific Guidelines for this Site:**
-1. **`tabindex="0"`** on each `.scroll-section` — puts sections in tab order
-2. **`role="region"` + `aria-label`** — screen reader announces "Portfolio region", "Commissions region" etc.
-3. **`aria-roledescription="scrollable section"`** — adds context for screen reader users
-4. **Visible focus styles** — `outline` or `ring` on `:focus-visible` for keyboard users (don't hide outlines)
-5. **`prefers-reduced-motion`** — respect user motion preferences; ensure scroll-snap still works but without smooth-scroll animation
+**Key observations:**
+- Uses `data-page="2"` (third page, 0-indexed)
+- Same scroll-snap pattern as Portfolio and Commissions sections
+- GlitterOverlay count={8} (sparsest of all pages)
+- No static import for a component — just inline HTML
 
-**Navigation Sidebar + Scroll-Snap Integration:**
-- Nav tab clicks should smoothly scroll to the corresponding section
-- When user Tabs through nav, highlight corresponding section
-- Ensure nav tabs have proper `role="tab"`, `aria-selected`, and `aria-controls` pointing to section IDs
+---
 
-**Scroll-Snap Type Consideration:**
-- `scroll-snap-type: y mandatory` — strong snapping, always snaps to nearest section
-  - Pro: Clean UX, always on a section boundary
-  - Con: Can feel aggressive; user may struggle to stop mid-section to read long content
-- `scroll-snap-type: y proximity` — softer snapping, only snaps when close to boundary
-  - Better for reading-heavy pages (commission info has cards to read)
-  - **Recommendation:** Use `proximity` instead of `mandatory` for the commission page since users need to read content within a section
+### 2. Import Patterns (CommissionInfo reference)
 
-**CSS Fix for Keyboard Scroll Support (from CSS-Tricks):**
+**File:** `src/routes/+page.svelte` — Line 6
+
+CommissionInfo is imported via **static import** at the top of the script:
+
+```ts
+import CommissionInfo from '$lib/components/CommissionInfo.svelte';
+```
+
+Used directly in the template without dynamic/lazy wrapping:
+
+```svelte
+<CommissionInfo status="open" />
+```
+
+**Pattern conclusion:** AboutMe should follow the same pattern — static import, direct use in template. (The `ComingSoon` component was already removed from page flow; it only exists as an orphan component file.)
+
+---
+
+### 3. Existing `rotateEarth` Animation
+
+**File:** `src/app.css` — Last keyframe block
+
 ```css
-.scroll-section {
-  scroll-snap-align: start;
-  /* Ensure sections are focusable for keyboard users */
-}
-
-/* Focus indicator — MUST be visible */
-.scroll-section:focus-visible {
-  outline: 2px solid #d4a853;
-  outline-offset: -2px;
-}
-
-/* Respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .scroll-container {
-    scroll-behavior: auto;
-  }
+@keyframes rotateEarth {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 ```
 
-**Sources:** web.dev (CSS scroll snap article), CSS-Tricks (keyboard users can't scroll overflow), W3C WAI keyboard interface practices, MDN scroll-snap docs, WebAIM tabindex best practices
+**Note:** This keyframe already exists but is **not used anywhere** currently. It was likely added in anticipation of Phase 4. The rotation is 360 degrees — a full CSS transform rotation.
 
-## Oracle Findings — Phase 3
+For a CSS-only earth globe, the plan suggests animating `background-position-x`, not `transform: rotate()`. The existing `rotateEarth` keyframe is transform-based. Need to decide: reuse existing keyframe for a different purpose (rotating orbit ring maybe) or create a new `background-position` animation for the globe itself.
 
-### CommissionInfo Architecture
-- **Single component** with section comments — no sub-components needed at this stage
-- **Only one prop:** `status: 'open' | 'closed'` for the commission status badge
-- All other content (pricing, ToS, DOs/DON'Ts, payment methods, header) is **static hardcoded**
+---
 
-### Layout
-- **Grid confirmed** as correct choice: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3`
-- **Smart spanning:** ToS card should span `lg:col-span-2` (it's the most content-heavy)
-- Payment + Status cards stay compact in single columns
+### 4. Static Assets
 
-### Scroll Integration Steps
-1. Remove ComingSoon dynamic import (`import('$lib/components/ComingSoon.svelte')`)
-2. Add static import: `import CommissionInfo from '$lib/components/CommissionInfo.svelte'`
-3. Update `pageNames` from `['About Me', 'Coming Soon']` → `['Portfolio', 'Commissions', 'About Me']`
-4. Update `tabColors` to 3 items
-5. Update `tabIcons` to 3 items
-6. Update `tabRotations` to 3 items
-7. Add `<GlitterOverlay count={10} />` to commission section
-8. Add a stub About Me section (page 2) to prevent IntersectionObserver tab-index mismatch
+**Directory:** `static/`
 
-### ⚠️ Critical Pitfalls
-1. **Tab-index mismatch** — If About Me section doesn't exist yet, tab for page 2 has no target → add a stub section immediately
-2. **IntersectionObserver flicker** — Change threshold from `0.5` to `[0.4, 0.6]` for 3 pages
-3. **`scroll-snap-stop: always`** — May feel sluggish on all 3 sections; consider `scroll-snap-stop: normal` on inner pages
-4. **tabColors reduction** — Safe because `% tabColors.length` handles it automatically
-5. **ComingSoon.svelte** — Becomes dead code; either delete or archive after Phase 3
-6. **Green status badge** — Verify `#22c55e` on `#0a0a1a` passes contrast (should be fine but check)
-7. **Scroll hint** — Direction should say "scroll down" (not "scroll to start")
+```
+AMORIA.woff2              (39,744 bytes)
+CaviarDreams.woff2        (22,260 bytes)
+CaviarDreams_Bold.woff2   (22,336 bytes)
+CaviarDreams_Italic.woff2 (25,216 bytes)
+CaviarDreams_BoldItalic.woff2 (25,340 bytes)
+favicon.svg               (1,569 bytes)
+robots.txt                (69 bytes)
+sitemap.xml               (233 bytes)
+```
 
-### Current Bug
-`pageNames = ['About Me', 'Coming Soon']` is **mislabeled** — clicking "About Me" scrolls to Portfolio. Phase 3 fix (`['Portfolio', 'Commissions', 'About Me']`) naturally resolves this.
+**No world map asset exists yet.** Task 1 of Phase 4 requires downloading/purchasing/creating a world map SVG or image for the CSS earth globe. SVG is preferred (scalable, no loading issues, small file size).
 
-### Phase 4 Globe Asset
-Recommended: **Wikimedia equirectangular SVG** (Public Domain), styled gold-on-navy, animated via CSS `background-position` loop. More Voyager-appropriate than photorealistic NASA imagery.
+---
 
-## Explorer Findings — Phase 3
+### 5. GlitterOverlay Density Usage
 
-### Scroll-Snap Structure
-- Layout uses `pageNames`, `tabColors`, `tabIcons`, `tabRotations` arrays with modulo indexing in `{#each}`
-- Currently **2 pages**: page 0 = Portfolio (labeled "About Me"), page 1 = ComingSoon (labeled "Coming Soon")
-- IntersectionObserver with `0.5` threshold drives `currentPage` state (`src/routes/+page.svelte:56-69`)
-- `scroll-snap-align: start` + `scroll-snap-stop: always` on each section
+| Page | Count | Meaning |
+|------|-------|---------|
+| Portfolio (page 0) | `count={20}` | Dense — busy creative space |
+| Commissions (page 1) | `count={10}` | Moderate — professional but creative |
+| About Me (page 2) | `count={8}` | Sparse — "edge of known space" (as per plan) |
 
-### Import Patterns
-- **Portfolio** and **GlitterOverlay** are static imports
-- **ComingSoon** is dynamically imported inside `onMount` via `import('$lib/components/ComingSoon.svelte')`
-- For Phase 3: CommissionInfo should be **static import** (always shown), remove lazy import + ComingSoon types
+**Source:** `src/lib/components/GlitterOverlay.svelte` accepts `count` prop, generates random star positions/movements. Default count is 15.
 
-### CSS Patterns
-- **Glassmorphism formula**: `bg-white/[0.04] border border-white/[0.08] rounded-2xl backdrop-blur`
-- **Font hierarchy**: `font-amoria` (titles/headers), `font-caviar` (body/labels), `font-space` (minimal)
-- **Gold gradient**: `linear-gradient(135deg, ...)` with `background-clip: text; -webkit-background-clip: text`
-- **No grid usage yet** — CommissionInfo will introduce `grid-cols-2 lg:grid-cols-3`
+---
 
-### Svelte 5 Patterns
-- `$state()`, `$derived()`, `$props()` used consistently
-- No `$effect()` anywhere — all side effects via `onMount`
-- `{@render children()}` for slots
+### 6. Existing Glass Card Patterns
 
-### Responsive Design
-- Fluid `clamp()` typography: `text-[clamp(2.8rem,11vw,5.5rem)]`
-- `h-[100dvh]` for viewport sections
-- Tailwind responsive prefixes: `md:`, `lg:`
+**Primary pattern** (from CommissionInfo.svelte):
 
-### ComingSoon Replacement
-- Uses purple tones (`#3a2248`, `#b0a6be`) — doesn't match Voyager palette
-- Cat heart images (`cat_heart.webp`/`cat_heart.gif`) can be cleaned up post-removal
+```svelte
+class="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 backdrop-blur-md"
+```
 
-### Summary of Phase 3 Recommendations
+**Variations:**
+- **Dashed border (gallery placeholder):** `bg-white/[0.04] border border-dashed border-white/[0.15] rounded-2xl p-6 backdrop-blur-md`
+- **Status card:** Same as primary + `border-2` + dynamic `{statusCardBorder}`
+- **Mini cards (ToS grid):** `bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 backdrop-blur-md`
+- **Nav background:** `bg-[#080612]/60 backdrop-blur-2xl border border-white/10 rounded-2xl`
+- **Player pill:** `bg-[#080612]/70 backdrop-blur-2xl border border-white/10 rounded-full`
 
-| Topic | Key Recommendation |
-|-------|-------------------|
-| **Commission page layout** | Card-based grid, 1-col mobile → 3-col desktop, status-first hierarchy |
-| **Glass cards** | `bg-white/[0.04] backdrop-blur-md border-white/[0.08] rounded-2xl` in Tailwind |
-| **Pricing UX** | Flat rate or "contact for quote" with tier hints; clear ToS at 50/50 split |
-| **Gold contrast** | `#d4a853` on `#0a0a1a` passes AA (~5.8:1); avoid gold on mid-blue |
-| **Svelte 5 reactivity** | Use `$derived()` for computed values, avoid `$effect` — commission page is static |
-| **Scroll-snap a11y** | Add `tabindex="0"` + `aria-label` + `role="region"` to each section; prefer `proximity` over `mandatory` |
-| **Status badge** | Green pulsing dot `● Open` with gold accent card, `role="status"` for a11y |
-| **Motion safety** | Wrap animations in `@media (prefers-reduced-motion: no-preference)` |
+**Consistent theme:** ~4% white bg (`bg-white/[0.04]`), `backdrop-blur-md`, subtle white borders at 8% opacity (`border-white/[0.08]`), rounded-2xl.
+
+---
+
+### 7. Font Usage
+
+| Font | Tailwind Class | Usage | Source |
+|------|---------------|-------|--------|
+| **Amoria** (cursive) | `font-amoria` | Hero headings (portfolio name), decorative text, quotes ("ask me anything!"), music track names, commission header | Custom woff2, `@font-face` in app.css |
+| **Caviar Dreams** | `font-caviar` | Body text, labels, nav tabs, buttons, ToS, Do/Don't lists, scroll hints, music player | Custom woff2 with bold/italic variants |
+| **Space Grotesk** | `font-space` | Small labels, secondary text, music metadata, status text, "sketches · lineart" tags | Google Fonts via `@import` |
+
+**Font pairing rule in practice:** Amoria = headers/decorative/accent, Caviar = workhorse body text, Space = tiny labels/metadata.
+
+---
+
+### 8. Responsive Patterns
+
+**clamp() usage:**
+- Portfolio hero: `font-size: clamp(3.5rem, 16vw, 7rem)` — fluid sizing with min/max
+- ComingSoon header: `text-[clamp(2.8rem,11vw,5.5rem)]` — similar fluid pattern
+
+**Tailwind breakpoints used:**
+- `sm:` (640px) — Main breakpoint for layout shift
+- `md:` (768px) — Grid column change
+- `lg:` (1024px) — Larger grid column change
+
+**Examples from CommissionInfo:**
+- `grid-cols-1 md:grid-cols-2 lg:grid-cols-3` — Responsive grid
+- `text-[2.8rem] sm:text-[3.5rem]` — Responsive font sizing
+- `px-3 sm:px-6` — Responsive padding
+- `grid-cols-1 sm:grid-cols-3` — ToS grid
+- `hidden sm:flex` — Show elements only on desktop (volume controls)
+
+**Overflow handling for commission scroll:** `py-12 px-3 sm:px-6 gap-6 overflow-y-auto` — content scrolls within the full-height section.
+
+---
+
+### 9. ComingSoon Component Status
+
+**File:** `src/lib/components/ComingSoon.svelte` — Exists but **not imported anywhere** in `+page.svelte`. It's an orphan component. The plan's Task 4 (remove ComingSoon from page flow) is already done — the "coming soon" was already replaced with an inline stub. No cleanup needed.
+
+---
+
+### 10. Existing Code Patterns Summary
+
+**Component structure:**
+- Svelte 5 runes: `$props()`, `$derived`, `$state()`
+- Props interface: `let { ... }: Props = $props()`
+- No SvelteKit `load` functions — all client-side
+- Tailwind CSS with custom theme tokens
+
+**Color tokens available:**
+- `deep-navy` (#0a0a1a) — page bg
+- `space-blue` (#1a3a5c) — accent blue
+- `sky-blue` (#7ba7c9) — labels, secondary accents
+- `gold` (#d4a853) — primary accent, highlights
+- `gold-dark` (#b8953a) — gold variant
+- `cream` (#f0eae8) — primary text
+- `muted` (#8899aa) — secondary text
+
+**Key rule from plan:** "No light purple anywhere" — all accent colors must stay in the navy/blue/gold/cream palette.
+
+---
+
+## Oracle Findings — Phase 4
+
+### 1. About Me Component Architecture
+
+**Recommendation: Single component** — `AboutMe.svelte` with logical section comments.
+
+The content (header, globe, info grid, quote footer) is cohesive and tightly scoped. Splitting into sub-components would add import/export overhead without benefit. The info grid items are not reused elsewhere in the site.
+
+**Structure breakdown:**
+
+```svelte
+<!-- AboutMe.svelte -->
+<script lang="ts">
+    interface Props {
+        favSong?: string;
+        games?: string;
+        specialInterest?: string;
+        birthday?: string;
+        myTypo?: string;
+        favoriteCharacters?: string;
+        location?: string;
+    }
+    let {
+        favSong = '754 — Cece Natalie',
+        games = 'Genshin, HSR, ZZZ',
+        specialInterest = 'Art, space, music, character design',
+        birthday = 'August · Leo season',
+        myTypo = 'i\'m just a silly little guy lost in space',
+        favoriteCharacters = '',
+        location = 'Malaysia'
+    }: Props = $props();
+</script>
+
+<!-- Outer glass card -->
+<div class="relative glass-card ...">
+    <!-- 1. Header -->
+    <section class="header">...</section>
+
+    <!-- 2. Earth Globe -->
+    <section class="globe-section">...</section>
+
+    <!-- 3. Info Grid -->
+    <section class="info-grid">...</section>
+
+    <!-- 4. Quote Footer -->
+    <section class="quote-footer">...</section>
+</div>
+```
+
+**Why this works:**
+- Follows the exact same pattern as `CommissionInfo.svelte` (single component, props interface, glass card)
+- Info items are distinct enought to warrant individual sections but not separate files
+- Props-based editing keeps content flexible without requiring component structural changes
+- No dynamic imports needed — static import in `+page.svelte` (same as CommissionInfo)
+
+**Props interface notes:**
+- Make the props optional with sensible defaults so the component works standalone
+- Use strings for all values (simple, type-safe, easy to pass from page-level data)
+- `myTypo` gets special gold styling treatment as per the plan
+- `favoriteCharacters` stays as a comma-separated string (future: could be an array if UI grows)
+
+---
+
+### 2. Earth Globe CSS Technique
+
+The `app.css` already has a `@keyframes rotateEarth` (transform rotation), but the globe needs `background-position-x` animation, not transform rotation. **Recommendation: Add a new keyframe specifically for the globe's background scroll, and repurpose the existing `rotateEarth` as an orbit ring animation if desired.**
+
+**CSS-only globe technique (proven, performant):**
+
+```css
+/* Keyframe for earth rotation */
+@keyframes earth-rotate {
+    0%   { background-position-x: 0; }
+    100% { background-position-x: -400px; } /* width of the image */
+}
+
+/* Globe element */
+.earth-globe {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: url('/world-map.jpg') repeat-x 0 0 / auto 100%;
+    animation: earth-rotate 20s linear infinite;
+    
+    /* 3D sphere illusion — dark side shadow */
+    box-shadow:
+        inset 8px 0 12px -4px rgba(0, 0, 0, 0.7),   /* left dark side */
+        inset -4px 0 8px -2px rgba(255, 255, 255, 0.1);  /* right atmospheric glow */
+    
+    /* Atmosphere glow ring */
+    &::after {
+        content: '';
+        position: absolute;
+        inset: -3px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 50%, transparent 60%, rgba(123, 167, 201, 0.12) 70%, transparent 85%);
+        pointer-events: none;
+    }
+}
+
+/* Prevents stutter on scroll — promote to own layer */
+.earth-globe {
+    will-change: background-position;
+}
+
+/* Accessibility — stop animation if user prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .earth-globe {
+        animation: none;
+        background-position: 0 0;
+    }
+}
+```
+
+**Why background-position-x instead of transform:rotate():**
+- `transform: rotate(360deg)` would spin the whole globe like a top (looking down from above) — wrong effect
+- `background-position-x` animates the world map image horizontally — correct rotation simulation for a sphere seen from the front
+- The inset `box-shadow` on the left side creates the dark hemisphere illusion
+- `::after` pseudo-element adds a subtle atmospheric glow (sky-blue tint at edge)
+
+The image must be 2:1 aspect ratio (equirectangular projection) and tile horizontally. The animation speed (20s) is a gentle rotation — not too fast, not too slow.
+
+---
+
+### 3. Data Flow: Props vs Hardcoded
+
+**Recommendation: Configurable props with defaults.** All 7 personal info fields should be props with sensible defaults.
+
+| Field | Default Value | Prop Name | Rationale |
+|-------|--------------|-----------|----------|
+| Fav Song | `754 — Cece Natalie` | `favSong` | Changes when Nasuha discovers new music |
+| Games | `Genshin, HSR, ZZZ` | `games` | Changes with new game releases |
+| Special Interest | `Art, space, music, character design` | `specialInterest` | Core identity, rarely changes |
+| Birthday | `August · Leo season` | `birthday` | Static — could stay as default only |
+| My Typo | `i'm just a silly little guy lost in space` | `myTypo` | Signature quote — might change |
+| Favourite Characters | `''` | `favoriteCharacters` | Changes often as Nasuha discovers new media |
+| Location | `Malaysia` | `location` | Static — could stay as default |
+
+**Implementation in `+page.svelte`:**
+
+```svelte
+<AboutMe
+    favSong="Someone New — Hozier"
+    games="Genshin, HSR, ZZZ, WuWa"
+    favoriteCharacters="Emilie (Genshin), Sparkle (HSR)"
+/>
+```
+
+**Why this pattern:**
+1. Same as `CommissionInfo`'s `status` prop — consistent component API
+2. `+page.svelte` becomes the content source of truth
+3. Nasuha can edit text without touching component internals
+4. Future-proofed for CMS or data-driven content
+5. Default values ensure the component renders standalone (good for testing/design iteration)
+
+---
+
+### 4. Globe Asset Recommendation
+
+**Primary recommendation: Small equirectangular JPG/PNG — larger image with fewer artifacts**
+
+| Source | File Type | Size (est.) | Pros | Cons |
+|--------|-----------|-------------|------|------|
+| **NASA Blue Marble (resized)** | JPG | ~30-60KB | Beautiful, realistic, public domain | Needs resize on download |
+| **Wikimedia BlankMap-World-Equirectangular.svg** | SVG | 1.26 MB | Vector, public domain (CC0) | TOO LARGE, has political borders |
+| **Natural Earth raster** | PNG | ~100-200KB | Clean, public domain | Less visually interesting than Blue Marble |
+| **Custom simplified SVG** | SVG | ~20-40KB | Ultra-light, scalable, no loading | Needs to be created — extra dev work |
+
+**Best practical choice: NASA Blue Marble equirectangular JPG, resized to 800×400px**
+
+Implementation steps:
+1. Download NASA's Blue Marble Next Generation equirectangular JPG
+2. Resize to 800×400px (or even 400×200px for a 110px globe)
+3. Save as `static/world-map.jpg`
+4. Use as `background: url('/world-map.jpg') ...` in the globe CSS
+
+**Why not SVG at 1.26MB:**
+- At 1.26MB, the Wikimedia SVG is the largest static asset by far (bigger than ALL fonts combined)
+- It has detailed political borders not visible at 110px
+- It would slow initial page load (render-blocking if CSS-referenced)
+
+**Alternative if SVG is strongly preferred:**
+- Find or create a simplified SVG with just continent outlines (no country borders)
+- Look for "world map continents only equirectangular svg" — these are often 20-40KB
+- Natural Earth's 1:110m cultural vectors simplified would work but needs SVG export
+
+**File placement:** Save as `static/world-map.jpg` (or `.svg`). References `world-map-2-1.jpg` in the plan are fine too — name is flexible.
+
+---
+
+### 5. Layout Trade-offs: Glass Card vs Full-Height & Responsive Grid
+
+**Glass card is the right choice.** Here's the analysis:
+
+**Why glass card wins over full-height:**
+- CommissionInfo uses scrollable content within the card — consistent pattern
+- The content (2-3 rows of info + globe + quotes) is compact enough for a card
+- Glass card creates visual hierarchy against the dark space background
+- Full-height would stretch content awkwardly (it's not dense enough to fill 100dvh)
+
+**Responsive grid strategy (info items):**
+
+| Viewport | Columns | Layout |
+|----------|---------|--------|
+| ≥768px (md) | 2 columns | 3-4 rows of info + globe sits above |
+| <768px (mobile) | 1 column | All items stack vertically |
+
+**Implementation:**
+
+```svelte
+<div class="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
+    <!-- Info items each in mini glass cards -->
+</div>
+```
+
+**Content order within the glass card:**
+
+```
+┌─────────────────────────────┐
+│      Header (centered)      │  ← "Sillyusachi" + subtitle
+├─────────────────────────────┤
+│        Earth Globe          │  ← 110px circle + "← earth — home"
+├─────────────────────────────┤
+│  ┌─────────┐ ┌─────────┐   │
+│  │Fav Song │ │  Games  │   │  ← 2-col grid on desktop
+│  └─────────┘ └─────────┘   │
+│  ┌─────────┐ ┌─────────┐   │
+│  │Special  │ │Birthday │   │
+│  └─────────┘ └─────────┘   │
+│  ┌────────────────────┐    │
+│  │     My Typo™       │    │  ← Full width (gold treated)
+│  └────────────────────┘    │
+│  ┌─────────┐ ┌─────────┐   │
+│  │  Fav    │ │Location │   │
+│  │  Chars  │ │ (+flag)  │   │
+│  └─────────┘ └─────────┘   │
+├─────────────────────────────┤
+│    Quote Footer (center)    │
+└─────────────────────────────┘
+```
+
+**Max-width recommendation: `max-w-[520px]`** (slightly smaller than 600px from the plan) — keeps the card tighter and more elegant for the content amount. This is a minor suggestion, 600px works fine too.
+
+**Vertical centering:**
+- Use `flex flex-col items-center justify-center h-full` on the section (same as Portfolio)
+- Card is vertically centered in viewport
+- Content overflow within card: `overflow-y-auto` (same pattern as CommissionInfo)
+- Gap between sections: `gap-4` to `gap-5`
+
+---
+
+### 6. Voyager Theming Consistency — Color Verification
+
+All planned colors verified against the established Voyager palette:
+
+| Element | Planned Color | Voyager Token | Verdict |
+|---------|---------------|---------------|---------|
+| Card bg | `bg-white/[0.04]` | glassmorphism base | ✅ Matches CommissionInfo |
+| Card border | `border-white/[0.08]` | subtle glass border | ✅ Matches CommissionInfo |
+| Card backdrop | `backdrop-blur-md` | glass effect | ✅ Matches CommissionInfo |
+| Header gold gradient | `#d4a853` → `#f0eae8` → `#d4a853` | gold + cream | ✅ Same as Portfolio hero |
+| Subtitle | `#8899aa` (muted) | muted text color | ✅ Matches all pages |
+| Labels (info grid) | `#7ba7c9` (sky-blue) | sky blue accented | ✅ Matches CommissionInfo labels |
+| Values (info grid) | `#f0eae8` (cream) | primary text | ✅ Site-wide standard |
+| Gold accent (My Typo) | `#d4a853` | gold accent | ✅ Matches Status, Pricing headers |
+| Location flag | Emoji flag | uses Unicode | ✅ Flexible, no palette issue |
+| Quote footer | font-amoria italic | decorative display | ✅ Matches Portfolio's "ask me anything!" |
+| Globe shadow blue | `rgba(123,167,201, 0.12)` | sky blue with opacity | ✅ Within palette |
+| Light purple | **Used nowhere** | ❌ must not use | ✅ Plan explicitly excludes it |
+
+**Potential gotchas to watch for:**
+1. The existing Portfolio component uses `#c8c0d0` (greyish lavender) for body text — this is acceptable (it's a muted neutral, not purple)
+2. The original portfolio's "Greetings" text in `#c8c0d0` is fine to keep on page 0
+3. All About Me colors must be explicitly from the navy/blue/gold/cream palette
+4. Globe atmosphere glow should use sky-blue (`#7ba7c9`), not any purple tone
+
+**Verdict: Theming is consistent.** No changes needed to the planned color scheme.
+
+---
+
+### 7. Animation Performance Assessment
+
+**Overall: No performance concerns.** Here's the breakdown per animation:
+
+| Animation | Technique | GPU Accelerated? | Cost |
+|-----------|-----------|-----------------|------|
+| Globe rotation | `background-position-x` animation | ✅ (compositor-only) | **Minimal** — single element, repaint not required |
+| GlitterOverlay (8 stars) | CSS opacity + transform animation | ✅ (compositor) | **Minimal** — 8 elements with simple keyframes |
+| backdrop-blur-md | CSS filter | ❌ (software rasterized on some browsers) | **Moderate** — one card per page |
+| Nav tab animations | CSS transform | ✅ (compositor) | **Minimal** — off-screen most of the time |
+| Music player vinyl | `conic-gradient` + `animation: spin` | ⚠️ mixed | **Low** — small element, GPU optimization varies |
+| Scroll-snap | Browser native | ✅ | **None** — managed by browser compositor |
+
+**Critical optimization: Only ONE page's animations run at a time.**
+
+Scroll-snap ensures only one section is visible. While hidden pages' CSS animations technically still tick, modern browsers aggressively throttle off-screen animation frames. This makes the combined cost far lower than if all animations ran simultaneously.
+
+**Specific recommendations:**
+
+```css
+/* Globe — promote to own compositor layer */
+.earth-globe {
+    will-change: background-position;
+}
+
+/* Already-optimized in existing code: */
+/* - Nav uses contain: layout style (prevents layout thrash) */
+/* - GlitterOverlay uses absolute positioning + pointer-events: none */
+/* - Music player uses contain: layout style */
+```
+
+**Mobile considerations:**
+- `backdrop-blur` is the most expensive effect — limiting it to ONE card per page is good discipline
+- Globe rotation runs at 20s per cycle — slow enough to avoid jank even on lower-end devices
+- `will-change: background-position` is a lightweight hint (unlike `will-change: transform` which sometimes causes oversubscription of GPU memory)
+- The `prefers-reduced-motion: reduce` media query handles accessibility gracefully
+
+**Verdict: Ship it.** The globe + GlitterOverlay + backdrop-blur combination is well within safe performance bounds for a site this simple. No WebGL, no heavy JS animation libraries, no canvas — just smart CSS.
+
+---
+
+## Librarian Findings — Phase 4
+
+### 1. CSS-Only Rotating Earth Globe Techniques
+
+**Core technique found across multiple sources (w3bits, CodePen, Stack Overflow):**
+
+**HTML:** Single `<div id="earth"></div>` (or inline in Svelte)
+
+**CSS mechanism:**
+1. Create a square `<div>` with `border-radius: 50%` (circle shape)
+2. Set `background-image` to an equirectangular world map
+3. Set `background-size: auto 100%` (or explicit pixel width matching the image width)
+4. Animate `background-position` horizontally via `@keyframes`
+
+```css
+@keyframes rotate {
+    0% { background-position: 0 0; }
+    100% { background-position: -630px 0; } /* move left by image width */
+}
+
+.earth {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: url(path/to/world-map) 0 0 repeat / 630px;
+    animation: rotate 8s linear infinite;
+}
+```
+
+**3D shading technique (from w3bits tutorial):**
+- **`box-shadow: inset 20px 0 80px 6px rgba(0,0,0,1)`** on the main earth div — creates a dark shadow on the right side, giving a 3D sphere illusion
+- **`::after` pseudo-element** with `box-shadow: -80px 15px 80px 10px rgba(0,0,0,.9) inset` — shadow on the left side for atmospheric depth
+- **`::before` pseudo-element** with `radial-gradient(circle at 100px 100px, #fff, #000)` + `opacity: .2` — spherical highlight overlay
+- This creates a convincing 3D globe using only CSS
+
+**Hemisphere highlight for Voyager theme:**
+- Instead of pure black shadows, use a gold-tinted shadow: `rgba(212, 168, 83, 0.15)` for a subtle gold glow on one hemisphere
+- Add a faint blue-white specular highlight via radial-gradient (matching Voyager's celestial aesthetic)
+
+**Key sizing consideration:** `background-size` pixel value must match your equirectangular image's natural width for seamless looping. If using a 2000px-wide image, set `background-size: 2000px`.
+
+**Alternative approach (CodePen):** Some implementations use `background-position-x` and `background-size: cover` with `background-repeat: repeat-x` for a cleaner looping effect. This is better when the exact image width isn't known.
+
+**Recommended approach for this project:**
+- Use a smaller globe (120px diameter) to keep it elegant as per plan
+- Create new `@keyframes rotateGlobe { 0% { background-position-x: 0; } 100% { background-position-x: -1024px; } }` (separate from existing `rotateEarth` which is transform-based)
+- Apply `will-change: background-position` and `transform: translateZ(0)` to the globe div for GPU compositing
+
+---
+
+### 2. Public Domain Equirectangular World Map Assets
+
+**Option A (RECOMMENDED): Solar System Scope 2K Earth Day Map**
+- **URL:** `https://www.solarsystemscope.com/textures/download/2k_earth_daymap.jpg`
+- **Size:** ~500KB-1MB JPEG, 2048×1024px equirectangular
+- **License:** Based on NASA imagery (Blue Marble data), color-enhanced, free for use
+- **Pros:** Beautiful true-color earth with clouds/vegetation, perfect 2:1 aspect ratio, ideal for CSS globe
+- **Cons:** JPEG (not SVG), but at ~500KB it's acceptable
+- **Direct download:** Works in browser/browser fetch confirmed (200 OK)
+
+**Option B: Wikimedia Commons Blank Equirectangular SVG**
+- **URL:** `https://upload.wikimedia.org/wikipedia/commons/9/9f/BlankMap-World-Equirectangular.svg`
+- **Size:** 1.31 MB SVG (but compresses well)
+- **License:** CC0 1.0 Universal Public Domain Dedication
+- **Pros:** SVG (scalable, no resolution issues), political map with country boundaries
+- **Cons:** Blank map (no terrain/colors—just outlines), political borders are visible, less visually interesting for a decorative globe
+
+**Option C: NASA Blue Marble (2002) — the original dataset**
+- **URL:** Available via NASA Visible Earth (`visibleearth.nasa.gov`)
+- **License:** Public domain (NASA imagery)
+- **Size:** Full resolution is 21,600×10,800 (huge), but scaled-down versions exist
+- **Cons:** Finding the exact direct URL for a web-optimized version requires navigating NASA's site; the Solar System Scope version is derived from this and already optimized
+
+**Recommendation:** Download Option A (`2k_earth_daymap.jpg`) to `static/world-map.jpg` — it's the most beautiful true-color earth, web-optimized at 2K, equirectangular, and free. If a stylized SVG is preferred for a more artistic/unique look, use Option B but note it's a blank political map (not beautiful terrain).
+
+**Stylized alternative (for Voyager theme):** Consider converting the earth map to a stylized version with gold continent outlines on a dark blue ocean for a more thematic look — but that requires manual image editing beyond the scope of this phase. The plan says "CSS rotating globe is enough for now" so the real NASA-derived texture is fine.
+
+---
+
+### 3. Glass Card Patterns — Best Practices for One-Page Section
+
+**Research from uxdesign, UX Pilot, and glassmorphism implementation guides:**
+
+**Centered Single Card vs Multiple Cards:**
+- **For an About Me page with personal info:** A single large centered glass card (`max-w-[600px]`) is the right call, as specified in the plan. This creates focus on the person rather than spreading content across multiple disconnected modules.
+- **Multiple cards** work better for commission info / pricing / portfolio grids where items need comparison or independent scrolling.
+
+**Glassmorphism best practices gathered:**
+
+| Aspect | Recommendation | Why |
+|--------|---------------|-----|
+| `backdrop-filter` blur | `blur(12px)` to `blur(20px)` | Less blur = background too visible; more = loses glass feel. On dark backgrounds, lower blur (12px) works better because there's less light to scatter. |
+| Background opacity | `rgba(255,255,255,0.04)` to `0.08` | Currently using `bg-white/[0.04]` — this is fine. Can go to 0.06 or 0.08 if text readability suffers. |
+| Border | `rgba(255,255,255,0.08)` to `0.12` | Subtle white border defines the card edge. The current `border-white/[0.08]` is good. |
+| Text contrast | Ensure label:value pairs have strong contrast | Labels in `#7ba7c9` (sky-blue) on glass bg = good. Values in `#f0eae8` (cream) = good. |
+| Background complexity | Need visible elements behind glass | On solid `#0a0a1a` background, glass effect is invisible. The GlitterOverlay stars provide background activity that makes the blur visible. |
+
+**For a centered single card on a dark background with GlitterOverlay:**
+- The existing `bg-white/[0.04] backdrop-blur-md border border-white/[0.08] rounded-2xl` pattern works perfectly
+- Adding a subtle gold border glow (`box-shadow: 0 0 20px rgba(212, 168, 83, 0.1)`) would elevate it for the Voyager theme
+- The GlitterOverlay behind the glass card will show through the blur, making the glass effect visible and dimensional
+
+**Grid within the card:** The plan calls for a 2-column grid inside the glass card (1 column on mobile). Each cell should be a mini glass fragment or just styled text. Recommend using the current pattern from CommissionInfo's grid items — `flex flex-col gap-1` with label+value pairs, no need for nested glass cards on an already-glass card (too many layers causes visual noise).
+
+---
+
+### 4. Artist About Me Page UX — How Digital Artists Present Personal Info
+
+**Research from portfolio sites (Format, Colorlib, SiteBuilderReport, real artist examples):**
+
+**Tone: More casual than professional.** Digital artists (especially on platforms like IG, Cara, Pixiv) lean toward a friendly, personal tone. Common patterns:
+
+| Element | Prevalence | Example |
+|---------|-----------|---------|
+| Online name / brand name | ~100% | The primary identity — often larger/emphasized |
+| Real name or pseudonym | ~70% | "Also known as..." |
+| Age range (18+) | ~30% | Common for artists who draw mature content |
+| Fave songs / playlists | ~25% | Adding personality, shared taste with audience |
+| Games played | ~35% | Video game artists often list games they play/love |
+| Fave characters | ~40% | Very common among anime/digital artists — builds community connection |
+| Birthday / zodiac | ~15% | Fun fact, not critical |
+| Special interests | ~50% | Art, space, music, fashion, etc. |
+| Quotes | ~20% | Personal motto, lyrics, or a running joke |
+| Location | ~60% | Relevant for commissions/shipping if selling prints |
+
+**Layout patterns:**
+- **Single column bio + details grid** — Most common for artist about pages. A short bio paragraph, followed by a structured details grid. This matches the plan's approach.
+- **Photo/avatar + details next to it** — Common but not applicable here (no real photo needed)
+- **Full-width quote or tagline** — Often used as a section divider or footer
+
+**The plan's info layout matches industry conventions very well:** Fav Song, Games, Special Interest, Birthday, Typo quote, Characters, Location — these are all things real digital artists put on their about pages. The only addition some artists include that's missing is a short bio paragraph (1-2 lines) before the grid. The plan's "voyager of dreams" subtitle partly fills this role.
+
+**Key UX insight from research:** The About Me page for artists is NOT about being professional — it's about **human connection**. Fans want to feel like they know the artist. The casual, personal tone ("my typo" quote, "silly little guy lost in space", listing fave characters) is exactly what resonates with an artist audience.
+
+---
+
+### 5. Voyager R1999 Globe Aesthetic — Stylistic Cues
+
+**From character wiki, Reddit appreciation threads, and art style analyses:**
+
+**Voyager's visual themes (relevant to the earth globe):**
+- **Celestial/astronomical theme:** Voyager is an alien from beyond the stars. Her design features deep space motifs — stars, distant galaxies, cosmic phenomena
+- **Gold accents on dark navy/blue:** Her outfit has gold embroidery, trims, and celestial patterns on a predominantly dark blue palette
+- **Golden lines and geometric celestial patterns:** Her design uses gold filigree lines, circular arc motifs, and star charts
+- **Dreamlike, ethereal quality:** Not harsh or military-sci-fi — soft, poetic, mysterious
+- **Violin/music connection:** She communicates through music — the globe could have subtle musical notation elements or a violin silhouette overlaid (but this might overcomplicate the CSS-only approach)
+- **"Weathered but elegant"** aesthetic described in CONTEXT.md — the gold should feel antique, not gaudy
+
+**Stylistic cues for the earth globe:**
+- **Instead of a realistic bright earth:** Consider a **weathered, aged map aesthetic** — like an old celestial atlas or antique globe
+- **Gold lines** for latitude/longitude or continent outlines if creating a custom stylized version
+- **The globe should feel like it belongs in space** — surrounded by dark, with faint gold glow on one side
+- **Small, elegant** (100-120px as specified) — it's a decorative focal point, not the main feature
+- **The label "← earth — home"** fits Voyager's alien perspective perfectly — she's from beyond, so "earth" is just "home"
+
+**Implementation ideas for Voyager-style globe:**
+- The Solar System Scope 2K texture is beautiful but very realistic — add CSS overlays to give it a more weathered/atmospheric look:
+  - Dark blue overlay at `opacity: 0.3` to mute the bright colors
+  - Gold radial gradient highlight on one side
+  - Faint outer glow `box-shadow: 0 0 30px rgba(212, 168, 83, 0.2)`
+- Alternatively, if the realistic texture feels out of place, create a simpler stylized SVG globe with:
+  - Dark blue ocean (`#1a3a5c`)
+  - Gold continent outlines
+  - Simple latitude/longitude lines in muted gold
+  - This would be more work but more thematically cohesive
+
+---
+
+### 6. Performance — backdrop-filter + CSS Animation + Particle Overlay
+
+**Research from Smashing Magazine, GPU acceleration guides, and Stack Overflow:**
+
+**Key finding: backdrop-filter is GPU-intensive.** Multiple authoritative sources warn against overusing it.
+
+| Component | GPU Cost | Mitigation |
+|-----------|----------|------------|
+| `backdrop-filter: blur()` | High — forces layer creation, every repaint of background requires re-blur | Use sparingly (1-2 layers). Smaller areas = better. |
+| CSS `background-position` animation | Medium — not on the "cheap" list (transform/opacity only) | Use `will-change: background-position` + `transform: translateZ(0)` to promote to GPU layer |
+| Particle overlay (GlitterOverlay) | Low-Medium — depends on count | Count=8 is very sparse, should be fine. Use `transform` for movement, not `top/left`. |
+| `backdrop-filter` + particle background | HIGH — particles moving behind a blurred glass card = the worst case | Each particle movement requires re-blur of the glass layer behind it |
+
+**Performance optimization techniques (from Smashing Magazine and other sources):**
+
+1. **Layer promotion:** Apply `will-change: transform` or `transform: translateZ(0)` to animated elements. This promotes them to their own compositing layer on the GPU.
+
+2. **Only animate transform and opacity:** These are the only two properties the GPU can composite without re-painting. `background-position` is NOT a composited property — the browser must repaint. However, for a simple 120px globe, this is negligible.
+
+3. **Minimize backdrop-filter surface area:** Keep the glass card small (max-w-[600px]) rather than full-width. The plan's 600px max-w is good.
+
+4. **Limit blur radius:** Use `blur(12px)` instead of `blur(20px+)`. Less GPU work, and on dark backgrounds, the difference is barely visible.
+
+5. **`will-change` best practices:**
+   - Set `will-change: transform` on the globe **only while animating** (not permanently, to avoid excess memory use)
+   - Set `will-change: backdrop-filter` on the glass card (this tells the browser to prepare a separate layer)
+   - Avoid setting `will-change` on many elements simultaneously
+
+6. **Specific recommendations for this project:**
+   - **Earth globe:** `will-change: background-position; transform: translateZ(0);` — promotes to GPU layer
+   - **Glass card:** `will-change: backdrop-filter;` — prepares blur compositing layer
+   - **GlitterOverlay count=8:** Very sparse — no optimization needed, but ensure stars animate via CSS `transform` (translate/scale) not `left/top`
+   - **Avoid nesting backdrop-filter:** Don't put a glass card inside another glass card
+   - **Animation duration:** Earth globe at 8-12s per rotation (slow, elegant) = fewer repaints per second than a fast 4s rotation
+
+7. **Browser compatibility notes:**
+   - `backdrop-filter` has ~95% global support. The `-webkit-backdrop-filter` prefix is still needed for Safari. The current project uses `backdrop-blur-md` (Tailwind) which handles prefixes.
+   - `will-change` is well supported in all modern browsers
+   - For browsers that don't support `backdrop-filter`, the glass card should gracefully degrade to a semi-opaque dark panel (`bg-[#0a0a1a]/80`)
+
+---
+
+### Summary of Recommendations for Phase 4 Implementation
+
+1. **World map asset:** Download `https://www.solarsystemscope.com/textures/download/2k_earth_daymap.jpg` to `static/world-map.jpg`
+2. **Globe CSS:** New `@keyframes rotateGlobe` animating `background-position-x`. Use `transform: translateZ(0)` and `will-change: background-position` for GPU promotion. Add inset shadows for 3D depth and gold-tinted outer glow for Voyager theme.
+3. **Glass card:** Use existing pattern (`bg-white/[0.04] backdrop-blur-md border border-white/[0.08] rounded-2xl`) with optional gold shadow accent. Single centered card with max-w-[600px].
+4. **Info grid layout:** 2-column grid inside card, label+value pairs (no nested glass cards). The casual, personal tone is correct for an artist audience.
+5. **Voyager theming:** Add gold-tinted globe glow, use muted earth colors with dark overlay, and keep the "← earth — home" label for narrative consistency.
+6. **Performance:** Apply `will-change` strategically, limit blur to 12px, slow globe rotation (10-12s), and verify GlitterOverlay uses transform-based animation.

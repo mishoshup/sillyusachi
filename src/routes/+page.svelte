@@ -4,6 +4,7 @@
 	import Portfolio from '$lib/components/Portfolio.svelte';
 	import GlitterOverlay from '$lib/components/GlitterOverlay.svelte';
 	import CommissionInfo from '$lib/components/CommissionInfo.svelte';
+import AboutMe from '$lib/components/AboutMe.svelte';
 	import { Play, Pause, SkipForward, SkipBack, Volume2, VolumeX } from '@lucide/svelte';
 	import Cece754 from '$lib/music/754.mp3';
 	import Roommates from '$lib/music/roommates.mp3';
@@ -405,9 +406,7 @@
 		aria-label="About Me"
 	>
 		<GlitterOverlay count={8} />
-		<div class="h-full flex items-center justify-center">
-			<p class="font-amoria text-[#8899aa] text-lg">about me coming soon ✦</p>
-		</div>
+		<AboutMe />
 	</section>
 </main>
 
