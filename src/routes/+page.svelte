@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { setupScrollSnap } from '$lib/scroll.js';
 	import { fly } from 'svelte/transition';
 	import Portfolio from '$lib/components/Portfolio.svelte';
 	import GlitterOverlay from '$lib/components/GlitterOverlay.svelte';
@@ -36,6 +37,7 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 	// ── Navigation ────────────────────────────────────────────────────────────
 	let scrollContainer: HTMLElement | undefined = $state();
 	let currentPage = $state(0);
+	let scrollCleanup: (() => void) | undefined = $state();
 	let navExpanded = $state(false);
 	const pageNames = ['Portfolio', 'Commissions', 'About Me'];
 	const tabColors = ['#7ba7c9', '#d4a853', '#5a8ab5'];
@@ -43,33 +45,19 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 	const tabRotations = [-1, 1.5, -0.5];
 
 	onMount(() => {
-		if (audio) {
-			audio.volume = volume;
-		}
-
-		const pageEls = Array.from(
-			scrollContainer?.querySelectorAll('[data-page]') ?? []
-		) as HTMLElement[];
-
-		const observer = new IntersectionObserver(
-			(entries) => {
-				entries.forEach((entry) => {
-					if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-						currentPage = Number(entry.target.getAttribute('data-page'));
-					}
-				});
-			},
-			{ threshold: [0.4, 0.6], root: scrollContainer }
-		);
-
-		pageEls.forEach((el) => observer.observe(el));
-		return () => observer.disconnect();
+		if (audio) audio.volume = volume;
+		if (!scrollContainer) return;
+		scrollCleanup = setupScrollSnap(scrollContainer, (page) => { currentPage = page; });
+		return () => scrollCleanup?.();
 	});
 
 	function scrollToPage(index: number) {
 		if (!scrollContainer) return;
 		const el = scrollContainer.querySelector(`[data-page="${index}"]`) as HTMLElement | null;
-		if (el) scrollContainer.scrollTo({ top: el.offsetTop, behavior: 'smooth' });
+		if (el) {
+			const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			scrollContainer.scrollTo({ top: el.offsetTop, behavior: prefersReduced ? 'instant' : 'smooth' });
+		}
 	}
 
 	// ── Music player functions ────────────────────────────────────────────────
@@ -368,13 +356,12 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 <main
 	bind:this={scrollContainer}
 	class="h-[100dvh] w-full overflow-y-auto"
-	style="scroll-snap-type: y mandatory; scrollbar-width: none; -ms-overflow-style: none; touch-action: pan-y;"
+	style="scrollbar-width: none; -ms-overflow-style: none; touch-action: pan-y;"
 >
 	<!-- Page 0: Portfolio -->
 	<section
 		data-page="0"
-		class="h-[100dvh] w-full relative"
-		style="scroll-snap-align: start; scroll-snap-stop: always; touch-action: pan-y;"
+		class="w-full relative flex flex-col overflow-hidden"
 		tabindex="0"
 		role="region"
 		aria-label="Portfolio"
@@ -386,8 +373,7 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 	<!-- Page 1: Commissions -->
 	<section
 		data-page="1"
-		class="h-[100dvh] w-full relative"
-		style="scroll-snap-align: start; scroll-snap-stop: always; touch-action: pan-y;"
+		class="w-full relative flex flex-col overflow-hidden"
 		tabindex="0"
 		role="region"
 		aria-label="Commissions"
@@ -399,8 +385,7 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 	<!-- Page 2: About Me -->
 	<section
 		data-page="2"
-		class="h-[100dvh] w-full relative"
-		style="scroll-snap-align: start; scroll-snap-stop: always; touch-action: pan-y;"
+		class="w-full relative flex flex-col overflow-hidden"
 		tabindex="0"
 		role="region"
 		aria-label="About Me"
@@ -529,4 +514,7 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 			3px 3px 18px rgba(0, 0, 0, 0.13),
 			inset 0 1px 0 rgba(255, 255, 255, 0.55);
 	}
+main::-webkit-scrollbar {
+  display: none;
+}
 </style>
