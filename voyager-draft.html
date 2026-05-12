@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voyager Theme Draft — Sillyusachi</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@400;600;700&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: #080612;
+  color: #f0eae8;
+  overflow: hidden;
+  height: 100dvh;
+}
+
+/* ── Animated starfield background ── */
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.starfield::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(59, 30, 84, 0.5) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(30, 60, 114, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(20, 16, 40, 0.8) 0%, transparent 50%);
+}
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle var(--duration) ease-in-out infinite;
+  animation-delay: var(--delay);
+  opacity: 0;
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.1; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+/* ── Floating stars (bigger decorative) ── */
+.floating-star {
+  position: absolute;
+  font-size: var(--size);
+  color: var(--color);
+  animation: floatStar var(--float-duration) ease-in-out infinite;
+  animation-delay: var(--delay);
+  opacity: 0.6;
+  pointer-events: none;
+}
+@keyframes floatStar {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+/* ── Nebula clouds ── */
+.nebula {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+/* ── Scroll container ── */
+.scroll-container {
+  position: relative;
+  z-index: 1;
+  height: 100dvh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+}
+.scroll-container::-webkit-scrollbar { display: none; }
+
+.page {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Glass card ── */
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Navigation ── */
+.nav {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px 8px 10px;
+  border-radius: 0 16px 16px 0;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-left: none;
+  background: rgba(10, 8, 24, 0.6);
+  backdrop-filter: blur(12px);
+  color: #b0a6be;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: translateX(-80%);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+.nav-btn:hover, .nav-btn.active {
+  transform: translateX(0);
+  color: #f0eae8;
+  background: rgba(212, 168, 83, 0.15);
+  border-color: rgba(212, 168, 83, 0.3);
+  box-shadow: 2px 2px 20px rgba(212, 168, 83, 0.08);
+}
+.nav-btn .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+.nav-btn.active .dot {
+  box-shadow: 0 0 8px var(--dot-color, #d4a853);
+}
+
+/* ── Music player ── */
+.music-player {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 50;
+}
+.player-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px 6px 6px;
+  border-radius: 100px;
+  background: rgba(10, 8, 24, 0.7);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.player-pill:hover {
+  border-color: rgba(212, 168, 83, 0.3);
+  box-shadow: 0 4px 20px rgba(212, 168, 83, 0.1);
+}
+.vinyl {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #1a0f24, #4a3258, #b0a6be, #4a3258, #1a0f24, #4a3258, #b0a6be, #4a3258, #1a0f24);
+  position: relative;
+  flex-shrink: 0;
+}
+.vinyl .label {
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #d4a853, #b8953a);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.vinyl .label::after {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #080612;
+}
+.vinyl.playing { animation: spin 4s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Specific page styles ── */
+
+/* Page 1: Portfolio */
+.hero-name {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(3.5rem, 15vw, 7rem);
+  background: linear-gradient(135deg, #f0eae8 0%, #d4a853 50%, #f0eae8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+.hero-sub {
+  color: #b0a6be;
+  font-size: clamp(0.8rem, 2vw, 1rem);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.social-links {
+  display: flex;
+  gap: 12px;
+  margin-top: 1rem;
+}
+.social-links a {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #b0a6be;
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: all 0.3s;
+}
+.social-links a:hover {
+  background: rgba(212, 168, 83, 0.15);
+  border-color: rgba(212, 168, 83, 0.3);
+  transform: translateY(-3px);
+  color: #d4a853;
+}
+
+/* Page 2: Commissions */
+.comm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  width: 100%;
+  max-width: 700px;
+}
+.comm-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 1.25rem;
+  transition: all 0.3s;
+}
+.comm-card:hover {
+  border-color: rgba(212, 168, 83, 0.2);
+  background: rgba(255,255,255,0.05);
+}
+.comm-card .icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+.comm-card h3 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.3rem;
+  color: #d4a853;
+}
+.comm-card p {
+  font-size: 0.7rem;
+  color: #b0a6be;
+  line-height: 1.6;
+}
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.status-open {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+.status-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* Page 3: About Me */
+.profile-card {
+  max-width: 600px;
+  width: 100%;
+}
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.avatar-placeholder {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d4a853, #7ba7c9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+.info-item {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 0.75rem;
+}
+.info-item .label {
+  font-size: 0.55rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #7ba7c9;
+  font-weight: 600;
+}
+.info-item .value {
+  font-size: 0.8rem;
+  color: #f0eae8;
+  margin-top: 2px;
+}
+
+/* ── Earth display ── */
+.earth-container {
+  position: relative;
+  width: 100px; height: 100px;
+  margin: 0 auto;
+}
+.earth {
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #4a90d9, #1a5276);
+  box-shadow:
+    0 0 40px rgba(74, 144, 217, 0.3),
+    inset -20px -20px 40px rgba(0,0,0,0.5);
+  position: relative;
+  overflow: hidden;
+  animation: rotateEarth 20s linear infinite;
+}
+.earth::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(ellipse 40% 30% at 20% 40%, rgba(74, 144, 217, 0.3) 0%, transparent 100%),
+    radial-gradient(ellipse 30% 50% at 60% 30%, rgba(39, 174, 96, 0.2) 0%, transparent 100%),
+    radial-gradient(ellipse 25% 40% at 70% 70%, rgba(39, 174, 96, 0.15) 0%, transparent 100%),
+    radial-gradient(ellipse 50% 30% at 40% 60%, rgba(74, 144, 217, 0.2) 0%, transparent 100%);
+}
+.earth::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    repeating-linear-gradient(90deg,
+      transparent 0px, transparent 3px,
+      rgba(255,255,255,0.03) 3px, rgba(255,255,255,0.03) 4px);
+  animation: earthShine 4s ease-in-out infinite;
+}
+@keyframes rotateEarth {
+  from { background-position: 0 0; }
+  to { background-position: 200px 0; }
+}
+@keyframes earthShine {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+/* ── Scroll hint ── */
+.scroll-hint {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  animation: bob 2s ease-in-out infinite;
+  opacity: 0.5;
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #b0a6be;
+}
+@keyframes bob {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-8px); }
+}
+
+/* ── Typography helpers ── */
+.font-display { font-family: 'Playfair Display', serif; }
+.text-gold { color: #d4a853; }
+.text-muted { color: #b0a6be; }
+.text-xs { font-size: 0.65rem; }
+.text-sm { font-size: 0.75rem; }
+.text-center { text-align: center; }
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.gap-1 { gap: 0.5rem; }
+.gap-2 { gap: 1rem; }
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.max-w-md { max-width: 28rem; }
+.max-w-lg { max-width: 32rem; }
+.w-full { width: 100%; }
+.leading-relaxed { line-height: 1.7; }
+
+/* ── Page title style ── */
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  margin-bottom: 1.5rem;
+  color: #f0eae8;
+}
+.page-title .accent {
+  color: #d4a853;
+}
+</style>
+</head>
+<body>
+
+<!-- Starfield Background -->
+<div class="starfield" id="starfield"></div>
+
+<!-- Navigation -->
+<nav class="nav" id="nav">
+  <button class="nav-btn active" data-page="0" onclick="scrollToPage(0)">
+    <span class="dot" style="--dot-color: #7ba7c9; background: #7ba7c9;"></span>
+    <span>Portfolio</span>
+  </button>
+  <button class="nav-btn" data-page="1" onclick="scrollToPage(1)">
+    <span class="dot" style="--dot-color: #d4a853; background: #d4a853;"></span>
+    <span>Commissions</span>
+  </button>
+  <button class="nav-btn" data-page="2" onclick="scrollToPage(2)">
+    <span class="dot" style="--dot-color: #c084fc; background: #c084fc;"></span>
+    <span>About Me</span>
+  </button>
+</nav>
+
+<!-- Music Player -->
+<div class="music-player">
+  <div class="player-pill" onclick="togglePlayer()">
+    <div class="vinyl playing" id="vinyl">
+      <div class="label"></div>
+    </div>
+    <span style="font-size: 0.7rem; font-weight: 600; color: #f0eae8;">Now Playing</span>
+    <span style="font-size: 0.6rem; color: #b0a6be;">✦</span>
+  </div>
+</div>
+
+<!-- Scroll Container -->
+<div class="scroll-container" id="scrollContainer">
+
+  <!-- PAGE 1: Portfolio -->
+  <section class="page">
+    <div class="text-center max-w-lg" style="position: relative; z-index: 2;">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='38' fill='none' stroke='%23d4a853' stroke-width='1' opacity='0.3'/%3E%3Ccircle cx='40' cy='40' r='30' fill='none' stroke='%23d4a853' stroke-width='0.5' opacity='0.2'/%3E%3Ccircle cx='40' cy='40' r='15' fill='none' stroke='%23d4a853' stroke-width='0.5' opacity='0.15'/%3E%3Ccircle cx='40' cy='40' r='3' fill='%23d4a853' opacity='0.6'/%3E%3C/svg%3E"
+           alt="" style="margin: 0 auto 1rem; opacity: 0.5;">
+      <h1 class="hero-name">Sillyusachi</h1>
+      <p class="hero-sub mt-1">✦ artist &amp; gamer ✦</p>
+      <p class="text-sm text-muted mt-2" style="max-width: 400px; line-height: 1.8;">
+        Greetings, call me Usachi. An artist who plays games!
+        Please look at the stars — each one is a story waiting. 𐙚 ‧₊˚ ⋅
+      </p>
+      <div class="social-links">
+        <a href="#" title="Discord">✦</a>
+        <a href="#" title="TikTok">♫</a>
+        <a href="#" title="Spotify">♪</a>
+        <a href="#" title="Kirke">⊹</a>
+      </div>
+    </div>
+    <div class="scroll-hint">scroll ↓</div>
+  </section>
+
+  <!-- PAGE 2: Commissions -->
+  <section class="page">
+    <div style="position: relative; z-index: 2; width: 100%; max-width: 750px;">
+      <div class="flex items-center justify-center gap-2" style="margin-bottom: 1rem;">
+        <h2 class="page-title text-center" style="margin-bottom: 0;">commission <span class="accent">info</span></h2>
+        <span class="status-badge status-open">
+          <span class="status-dot"></span>
+          open
+        </span>
+      </div>
+      <p class="text-xs text-muted text-center" style="margin-bottom: 1.5rem; letter-spacing: 0.08em;">
+        ✦ each piece is crafted with care ✦
+      </p>
+      <div class="comm-grid">
+        <div class="comm-card">
+          <div class="icon">🎨</div>
+          <h3>Gallery</h3>
+          <p>Art samples &amp; style references coming soon. Each piece tells a story.</p>
+        </div>
+        <div class="comm-card">
+          <div class="icon">💰</div>
+          <h3>Pricing</h3>
+          <p>Contact for current rates. Prices vary by complexity, from sketches to full renders.</p>
+        </div>
+        <div class="comm-card">
+          <div class="icon">📋</div>
+          <h3>Terms</h3>
+          <p>50% upfront, 50% on completion. 2-4 week turnaround. Unlimited revisions on sketch phase.</p>
+        </div>
+        <div class="comm-card">
+          <div class="icon">✓</div>
+          <h3>Dos &amp; Don'ts</h3>
+          <p>✅ OCs, fanart, references<br>❌ NSFW, AI training, commercial use</p>
+        </div>
+        <div class="comm-card">
+          <div class="icon">💳</div>
+          <h3>Payment</h3>
+          <p>Accepting: PayPal, ShopeePay, Touch 'n Go eWallet. Invoice provided.</p>
+        </div>
+        <div class="comm-card" style="border-color: rgba(212, 168, 83, 0.15);">
+          <div class="icon">✦</div>
+          <h3 style="color: #f0eae8;">Commission Status</h3>
+          <p style="color: #22c55e; font-weight: 600;">● Open for commissions!<br>DM to discuss your idea ✦</p>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-hint">scroll ↓</div>
+  </section>
+
+  <!-- PAGE 3: About Me (Voyager Themed) -->
+  <section class="page">
+    <div style="position: relative; z-index: 2; width: 100%; max-width: 650px;">
+      <div class="flex items-center gap-2" style="justify-content: center; margin-bottom: 0.5rem;">
+        <h2 class="page-title" style="margin-bottom: 0;">about <span class="accent">me</span></h2>
+      </div>
+
+      <div class="glass profile-card">
+        <div class="profile-header">
+          <div class="avatar-placeholder">✦</div>
+          <div>
+            <div class="font-display" style="font-size: 1.5rem; color: #f0eae8;">Sillyusachi</div>
+            <div style="font-size: 0.65rem; color: #b0a6be; letter-spacing: 0.15em; text-transform: uppercase;">
+              Usachi · 18+ · voyager of dreams
+            </div>
+          </div>
+        </div>
+
+        <div class="earth-container" style="margin-bottom: 1rem;">
+          <div class="earth"></div>
+          <div style="position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%); font-size: 0.55rem; color: #b0a6be; white-space: nowrap; letter-spacing: 0.12em;">
+            ← earth — home
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="label">🎵 Fav Song</div>
+            <div class="value">754 — Cece Natalie</div>
+          </div>
+          <div class="info-item">
+            <div class="label">🎮 Games</div>
+            <div class="value">Genshin, HSR, ZZZ, a little of everything</div>
+          </div>
+          <div class="info-item">
+            <div class="label">✨ Special Interest</div>
+            <div class="value">Art, space, music, character design</div>
+          </div>
+          <div class="info-item">
+            <div class="label">🎂 Birthday</div>
+            <div class="value">August · Leo season</div>
+          </div>
+          <div class="info-item" style="grid-column: 1 / -1;">
+            <div class="label">💬 My Typo™</div>
+            <div class="value" style="font-style: italic; color: #d4a853;">
+              "i'm just a silly little guy lost in space"
+            </div>
+          </div>
+          <div class="info-item" style="grid-column: 1 / -1;">
+            <div class="label">🌟 Favourite Characters</div>
+            <div class="value">
+              Furina · Hu Tao · March 7th · Silver Wolf · and many more~
+            </div>
+          </div>
+          <div class="info-item" style="grid-column: 1 / -1;">
+            <div class="label">📍 From</div>
+            <div class="value">Malaysia 🇲🇾 — somewhere on that spinning blue marble above</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.06); text-align: center;">
+          <div class="font-display" style="font-size: 0.9rem; color: #b0a6be; font-style: italic;">
+            "the stars incline us, they do not bind us."
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+// ── Generate starfield ──
+const sf = document.getElementById('starfield');
+for (let i = 0; i < 180; i++) {
+  const star = document.createElement('div');
+  star.className = 'star';
+  const size = 0.5 + Math.random() * 2.5;
+  star.style.width = size + 'px';
+  star.style.height = size + 'px';
+  star.style.left = Math.random() * 100 + '%';
+  star.style.top = Math.random() * 100 + '%';
+  star.style.setProperty('--duration', 2 + Math.random() * 4 + 's');
+  star.style.setProperty('--delay', Math.random() * 4 + 's');
+  sf.appendChild(star);
+}
+
+// Floating decorative stars
+const chars = ['✦', '⊹', '˚', '✧', '⋆'];
+const colors = ['#7ba7c9', '#d4a853', '#c084fc', '#f0eae8'];
+for (let i = 0; i < 25; i++) {
+  const el = document.createElement('div');
+  el.className = 'floating-star';
+  el.textContent = chars[Math.floor(Math.random() * chars.length)];
+  el.style.setProperty('--size', (0.8 + Math.random() * 1.8) + 'rem');
+  el.style.setProperty('--color', colors[Math.floor(Math.random() * colors.length)]);
+  el.style.left = Math.random() * 100 + '%';
+  el.style.top = Math.random() * 100 + '%';
+  el.style.setProperty('--float-duration', 6 + Math.random() * 8 + 's');
+  el.style.setProperty('--delay', Math.random() * 6 + 's');
+  sf.appendChild(el);
+}
+
+// Nebula clouds
+const nebulaColors = ['#3b1e54', '#1e3c72', '#4a1942'];
+for (let i = 0; i < 3; i++) {
+  const n = document.createElement('div');
+  n.className = 'nebula';
+  const size = 200 + Math.random() * 400;
+  n.style.width = size + 'px';
+  n.style.height = size + 'px';
+  n.style.left = (10 + Math.random() * 70) + '%';
+  n.style.top = (10 + Math.random() * 70) + '%';
+  n.style.background = nebulaColors[i];
+  sf.appendChild(n);
+}
+
+// ── Scroll snap navigation ──
+const container = document.getElementById('scrollContainer');
+const pages = container.querySelectorAll('.page');
+const navBtns = document.querySelectorAll('.nav-btn');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting && entry.intersectionRatio >= 0.4) {
+      const idx = Array.from(pages).indexOf(entry.target);
+      navBtns.forEach((b, i) => b.classList.toggle('active', i === idx));
+    }
+  });
+}, { threshold: 0.5, root: container });
+
+pages.forEach(p => observer.observe(p));
+
+function scrollToPage(idx) {
+  pages[idx]?.scrollIntoView({ behavior: 'smooth' });
+}
+
+// ── Music player toggle (demo) ──
+let playerExpanded = false;
+function togglePlayer() {
+  playerExpanded = !playerExpanded;
+  const pill = document.querySelector('.player-pill');
+  if (playerExpanded) {
+    pill.style.borderColor = 'rgba(212, 168, 83, 0.3)';
+    pill.style.boxShadow = '0 4px 20px rgba(212, 168, 83, 0.1)';
+  } else {
+    pill.style.borderColor = 'rgba(255,255,255,0.08)';
+    pill.style.boxShadow = 'none';
+  }
+}
+</script>
+</body>
+</html>

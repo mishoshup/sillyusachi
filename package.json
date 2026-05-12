@@ -35,6 +35,7 @@
 	},
 	"dependencies": {
 		"@lucide/svelte": "^1.3.0",
-		"@rodneylab/svelte-social-icons": "^0.0.31"
+		"@rodneylab/svelte-social-icons": "^0.0.31",
+		"lenis": "^1.3.23"
 	}
 }

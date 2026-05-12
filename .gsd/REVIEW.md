@@ -1,123 +1,148 @@
-# ⚖️ Council Review: Voyager R1999 Theme Overhaul
+# Council Review — Lenis Implementation
 
-**Status:** `CHANGES_REQUESTED`
+## Criterion-by-Criterion Analysis
 
-## Verdict
+### 1. ✅ Lenis API Usage Matches Context7 Docs
+**Verdict: CHANGES_REQUESTED** — minor issue with `onSnapComplete`
 
-The plans are well-structured, thorough, and mostly correct — but **two color tokens re-introduce purple tones** that CONTEXT.md explicitly bans. Fix those and I'd approve. Issues are specific and minor, no fundamental rework needed.
+The core API usage is correct:
+- `type: 'lock'` — Valid option (`'proximity'`, `'mandatory'`, `'lock'` are supported)
+- `align: ['start', 'end']` — Valid; docs show array of alignment points for `addElement`
+- `distanceThreshold: '40%'`, `debounce: 500`, `lerp: 0.08`, `duration: 0.8` — All valid
+- `snap.goTo(index)`, `snap.resize()`, `snap.destroy()`, `lenis.destroy()` — Valid methods
 
----
+**Issue found:** `onSnapComplete` callback signature mismatch.
 
-## ✅ What's Good
+The plan assigns:
+```javascript
+snap.onSnapComplete = ({ target }) => { ... }
+```
 
-| Criterion | Verdict |
-|-----------|---------|
-| **Agrees with CONTEXT locked decisions** | Mostly ✅ — see issues below |
-| **Clear action statements** | ✅ Each task has precise actions (what to change, what to keep) |
-| **Files specified** | ✅ Every task names exact files |
-| **No conflicting file order across phases** | ✅ Phases build sequentially, `+page.svelte` is the only shared file and changes are ordered correctly |
-| **Feasibility (Svelte 5 + Tailwind v4)** | ✅ Uses `$props()` runes, CSS `@theme`, arbitrary values — all correct |
-| **Component structure preserved** | ✅ Nav rotation, music player logic explicitly noted as unchanged |
-| **Sparse particles** | ✅ 10-15 range per section, 8 for About Me |
-| **No Light Purple** | ⚠️ See below |
-| **Gold accents** | ✅ Used for nav active state, progress bar, play button, headings |
-| **Same nav mechanics** | ✅ Task 2: "Keep ALL rotation mechanics unchanged" |
-| **Same music player** | ✅ Task 3: "Keep ALL variables, functions, event handlers... EXACTLY as-is" |
-| **Correct page structure** | ✅ 3 pages: Portfolio → Commissions → About Me |
+But the Context7 Lenis Snap docs specify the callback receives `({ index, value })` — no `target` DOM element is available. The plan tries to access `target?.closest?.('[data-page]')` which will always be `undefined`, breaking nav tracking entirely.
 
----
+**Fix:** Use the `index` parameter instead. Since each section has 2 snap points (start + end at positions `index * 2` and `index * 2 + 1`), page index = `Math.floor(index / 2)`:
 
-## ❌ Issues to Fix
+```javascript
+snap.onSnapComplete = ({ index }) => {
+  const pageIdx = Math.floor(index / 2);
+  if (pageIdx < sections.length) onPageChange(pageIdx);
+};
+```
 
-### Issue 1 (Must Fix): Purple tones re-introduced in Phase 01 color tokens
-
-**Files affected:** `Phase 01 — Task 1 / Task 2`
-
-**Problem:**
-
-The locked palette says **"NO light purple — remove all ... purple tones"** and specifies only blues (`#0a0a1a`, `#1a3a5c`, `#7ba7c9`), cream (`#f0eae8`), and gold (`#d4a853`, `#b8953a`).
-
-Three tokens break this:
-
-| Token | Value | RGB | Problem |
-|-------|-------|-----|---------|
-| `--color-space-deep` | `#0f0a2e` | R=15, G=10, B=46 | **Dark violet** — R is 50% of B, gives purple cast |
-| `--color-muted` | `#b0a6be` | R=176, G=166, B=190 | **Light purple-gray** — unmistakable purple tone |
-| Gradient `to-[#1a0f30]` | `#1a0f30` | R=26, G=15, B=48 | **Dark violet** — same issue as space-deep |
-
-**Impact:** These cascade into Phase 02 (music player vinyl uses both `#1a0f24` and `#b0a6be`), so fixing Phase 01 also fixes Phase 02 vinyl colors.
-
-**Fix recommendations:**
-
-| Token | Replace With | RGB | Why |
-|-------|-------------|-----|-----|
-| `--color-space-deep` | `#0a0a2a` | R=10, G=10, B=42 | Deep navy, no purple cast |
-| `--color-muted` | `#8899aa` or `#9a8a7a` | Sky-grey **or** warm taupe | Blue-adjacent muted or warm cream-toned |
-| Gradient `to-*` | `#0a0a2e` or `#050d22` | | Deep blue, not violet |
-
-**Or even simpler:** Use the exact locked values from CONTEXT where possible:
-- Deep navy: `#0a0a1a` (as specified)
-- Space blue: `#1a3a5c`
-- Skip `space-deep` entirely — it's not in the locked palette
-
-### Issue 2 (Minor): Phase 02 music player vinyl still uses purple-toned colors
-
-**File:** `Phase 02 — Task 3`
-
-**Problem:**
-- Vinyl uses `#1a0f24` (dark purple — R=26, G=15, B=36) and `#b0a6be` (purple-gray)
-- These cascade from Issue 1, but should be explicitly fixed
-
-**Fix:**
-- `#1a0f24` → `#0f0a1a` (near-black navy)
-- `#b0a6be` → `#8899aa` (muted sky-blue) or `#8a7a6a` (warm muted)
-
-### Issue 3 (Minor): Phase 01 — deep-navy doesn't match locked palette
-
-**File:** `Phase 01 — Task 1`
-
-The locked palette says `#0a0a1a` for deep navy. Plan uses `#080612`. While close, using the exact locked value `#0a0a1a` would be more faithful to the spec. Minor — up to the implementer.
-
-### Issue 4 (Note): `+page.svelte` modified in 3 phases
-
-**Not a defect**, but worth flagging for execution:
-- Phase 02 Task 2 & 3 modify `+page.svelte` (nav restyle + player restyle)
-- Phase 03 Task 2 modifies it (wiring commission page)
-- Phase 04 Task 2 & 3 modify it (wiring about page + remove ComingSoon)
-
-Since phases are numbered sequentially, this is fine if executed in order. But each phase must start from the output of the previous phase for this file. **Recommendation:** When implementing, batch all `+page.svelte` changes into a single pass (or use clear diff boundaries).
-
-### Issue 5 (Note): Earth globe asset not specified
-
-**File:** `Phase 04 — Task 1`
-
-Earth globe uses CSS `background: url(world-map.jpg)`. The plan doesn't specify where to source this image (needs an equirectangular world map projection). The Research doc references w3bits.com, but no actual asset URL or download step is included.
-
-**Recommend:** Add a step to download a public-domain world map (e.g., from Wikimedia Commons) into `src/lib/assets/` or `static/`.
-
-### Issue 6 (Suggestion): No Voyager-specific decorative motifs
-
-The theme is explicitly "Voyager from Reverse: 1999" — an alien violinist. But the plan's decorative elements are purely celestial (stars, symbols). Adding subtle violin/musical motifs would strengthen the thematic connection:
-- Swirling musical staff lines as decorative SVG borders
-- A violin silhouette buried subtly in the Portfolio page decoration
-- Musical notation floating alongside the celestial symbols
-
-Not required for MVP — purely a polish suggestion.
+Also, prefer passing `onSnapComplete` in the constructor options rather than as a post-hoc property assignment for reliability.
 
 ---
 
-## 🟢 Recommendations Summary
+### 2. ✅ Handles Mixed-Height Sections Correctly
+**Verdict: APPROVED**
 
-| Severity | Count | Action |
-|----------|-------|--------|
-| **Must fix** | 1 | Fix purple-toned color tokens (Issues 1 → cascade fixes 2) |
-| **Should fix** | 0 | — |
-| **Note** | 3 | File ordering, globe asset, thematic polish |
+The `{ type: 'lock', align: ['start', 'end'] }` approach correctly handles both cases:
+- **Short sections (< 100dvh):** start snap = content top, end snap = content bottom. Since the section is shorter than viewport, both snap points are the same position effectively, giving full-viewport behavior.
+- **Tall sections (> 100dvh):** start snap = content top, end snap = content bottom. User can scroll freely between the two resting points via Lenis smooth scroll, then snaps to the nearest when released.
 
-## ✅ If You Apply the Fixes
-
-**APPROVED.** The plans are detailed, actionable, and technically sound. No architectural blockers, no Svelte 5/Tailwind v4 compatibility issues, and all CONTEXT.md locked decisions are respected. The only problem is specific color hex values re-introducing the very purple tones you're explicitly removing.
+The `lock` type combined with `distanceThreshold: '40%'` lets users browse tall section content while ensuring clean snap behavior — no free-floating rest positions between sections.
 
 ---
 
-*Reviewed by **Council ⚖️** — 11 May 2026*
+### 3. ⚠️ Nav Sidebar Tracking via onSnapComplete
+**Verdict: CHANGES_REQUESTED** (consequence of issue #1)
+
+Will not work as written due to `{ target }` vs `{ index, value }` mismatch. See fix in criterion 1 above. Once the callback uses `Math.floor(index / 2)` to derive the page, this will work correctly.
+
+---
+
+### 4. ✅ Clean Separation — scroll-snap.js Standalone
+**Verdict: APPROVED**
+
+The new `src/lib/scroll-snap.js` module:
+- Exports a single `setupLenis()` function with clear parameters `(wrapper, onPageChange)`
+- Returns a cleanup function for proper Svelte `onMount` lifecycle
+- Has zero dependency on the old `scroll.js` module
+- All scroll logic is self-contained (Lenis init, Snap setup, RAF loop, resize handler, cleanup)
+- Old `scroll.js` is deleted — no orphaned code
+
+Clean separation pattern. ✅
+
+---
+
+### 5. ✅ Bundle Size Impact (~10.6KB gzipped)
+**Verdict: APPROVED**
+
+Lenis core (~8KB gzipped) + Snap module (~2-3KB gzipped) ≈ 10-11KB gzipped. The plan's estimate of ~10.6KB is plausible and well within acceptable bounds for a site that gains smooth scroll + proper snap behavior. This replaces the old scroll.js which had zero external dependencies but compromised UX on tall sections.
+
+---
+
+### 6. ⚠️ No Regressions — Music Player, Nav Toggle, Portfolio
+**Verdict: CHANGES_REQUESTED** — scrollToPage nav interaction
+
+- **Music player** — Unchanged. ✅
+- **Nav toggle** — Unchanged. ✅
+- **Portfolio component** — Unchanged. ✅
+- **Audio element** — Unchanged. ✅
+- **Style cleanup** — Correctly retains `main::-webkit-scrollbar { display: none }`, removes snap classes. ✅
+
+**Issue found:** `scrollToPage` in `+page.svelte` uses native `el.scrollIntoView({ behavior: 'smooth' })` as a fallback. This bypasses Lenis entirely:
+
+```
+function scrollToPage(index: number) {
+  if (!scrollContainer) return;
+  const el = scrollContainer.querySelector(`[data-page="${index}"]`);
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
+```
+
+Since Lenis now controls scrolling on `<main>`, calling native `scrollIntoView` will:
+1. Fight with Lenis's scroll control
+2. Produce jerky/conflicting motion (Lenis intercepts native scroll events)
+3. NOT trigger snap behavior
+
+**Fix:** Export a `scrollToPage` function from `scroll-snap.js` that uses `snap.goTo(index * 2)`, then import and use it in `+page.svelte`:
+
+```javascript
+// In scroll-snap.js, return from setupLenis:
+return {
+  cleanup() {
+    window.removeEventListener('resize', onResize);
+    snap.destroy();
+    lenis.destroy();
+  },
+  scrollToPage(index) {
+    snap.goTo(index * 2);
+  }
+};
+```
+
+Then in `+page.svelte`:
+```javascript
+const setup = setupLenis(scrollContainer, (page) => { currentPage = page; });
+scrollCleanup = setup.cleanup;
+// Store scrollToPage for nav:
+pageScrollTo = setup.scrollToPage;
+```
+
+This keeps Lenis in control and uses the proper snap API for programmatic navigation.
+
+---
+
+### 7. ✅ Test Cases Comprehensive (5 TCs)
+**Verdict: APPROVED** (with caveat that TC-3 and TC-4 depend on fixes above)
+
+| TC | Description | Status |
+|----|-------------|--------|
+| TC-1 | Short sections snap fullscreen | ✅ Sound |
+| TC-2 | Tall sections: snap → scroll → friction → snap next | ✅ Sound |
+| TC-3 | Nav sidebar tracks current page | ⚠️ Will fail until onSnapComplete callback is fixed (Criterion 1) |
+| TC-4 | Nav button clicks scroll to section | ⚠️ Will fail until scrollToPage uses Lenis/Snap API (Criterion 6) |
+| TC-5 | Build passes | ✅ Standard SvelteKit build — no expected issues |
+
+---
+
+## Verdict: CHANGES_REQUESTED
+
+Two issues must be resolved before approval:
+
+1. **`onSnapComplete` callback** — Change `({ target })` to `({ index })` and derive page index via `Math.floor(index / 2)` (file: `scroll-snap.js`)
+
+2. **`scrollToPage` nav interaction** — Replace native `el.scrollIntoView()` in `+page.svelte` with a Lenis-first approach using `snap.goTo(index * 2)` exposed from `scroll-snap.js` (files: `scroll-snap.js` + `+page.svelte`)
+
+Once both fixes are applied, this plan is solid. The architecture, mixed-height handling, bundle impact, and separation of concerns are all well-considered.

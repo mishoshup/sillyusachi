@@ -5,6 +5,6 @@ import { defineConfig } from 'vite';
 export default defineConfig({
 	plugins: [sveltekit(), tailwindcss()],
 	server: {
-		allowedHosts: ['nasuha.cloud-miso.top']
+		allowedHosts: ['nasuha.cloud-miso.top', 'openclaw-personal.tailf76c68.ts.net']
 	}
 });

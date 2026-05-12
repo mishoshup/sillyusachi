@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { setupScrollSnap } from '$lib/scroll.js';
+	import { setupLenis } from '$lib/scroll-snap.js';
 	import { fly } from 'svelte/transition';
 	import Portfolio from '$lib/components/Portfolio.svelte';
-	import GlitterOverlay from '$lib/components/GlitterOverlay.svelte';
 	import CommissionInfo from '$lib/components/CommissionInfo.svelte';
 import AboutMe from '$lib/components/AboutMe.svelte';
 	import { Play, Pause, SkipForward, SkipBack, Volume2, VolumeX } from '@lucide/svelte';
@@ -37,7 +36,7 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 	// ── Navigation ────────────────────────────────────────────────────────────
 	let scrollContainer: HTMLElement | undefined = $state();
 	let currentPage = $state(0);
-	let scrollCleanup: (() => void) | undefined = $state();
+	let lenisApi: { cleanup: () => void; scrollToPage: (index: number) => void } | null = $state(null);
 	let navExpanded = $state(false);
 	const pageNames = ['Portfolio', 'Commissions', 'About Me'];
 	const tabColors = ['#7ba7c9', '#d4a853', '#5a8ab5'];
@@ -45,18 +44,16 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 	const tabRotations = [-1, 1.5, -0.5];
 
 	onMount(() => {
-		if (audio) audio.volume = volume;
 		if (!scrollContainer) return;
-		scrollCleanup = setupScrollSnap(scrollContainer, (page) => { currentPage = page; });
-		return () => scrollCleanup?.();
+		if (audio) audio.volume = volume;
+		const result = setupLenis(scrollContainer, (page) => { currentPage = page; });
+		lenisApi = result;
+		return () => result.cleanup();
 	});
 
 	function scrollToPage(index: number) {
-		if (!scrollContainer) return;
-		const el = scrollContainer.querySelector(`[data-page="${index}"]`) as HTMLElement | null;
-		if (el) {
-			const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-			scrollContainer.scrollTo({ top: el.offsetTop, behavior: prefersReduced ? 'instant' : 'smooth' });
+		if (lenisApi) {
+			lenisApi.scrollToPage(index);
 		}
 	}
 
@@ -355,42 +352,39 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 <!-- ── Scroll container ────────────────────────────────────────────────────── -->
 <main
 	bind:this={scrollContainer}
-	class="h-[100dvh] w-full overflow-y-auto"
-	style="scrollbar-width: none; -ms-overflow-style: none; touch-action: pan-y;"
+	class="h-[100dvh] w-full"
+	style="touch-action: pan-y;"
 >
 	<!-- Page 0: Portfolio -->
 	<section
 		data-page="0"
-		class="w-full relative flex flex-col overflow-hidden"
+		class="w-full relative flex flex-col overflow-hidden min-h-[100dvh]"
 		tabindex="0"
 		role="region"
 		aria-label="Portfolio"
 	>
-		<GlitterOverlay count={20} />
 		<Portfolio />
 	</section>
 
 	<!-- Page 1: Commissions -->
 	<section
 		data-page="1"
-		class="w-full relative flex flex-col overflow-hidden"
+		class="w-full relative flex flex-col overflow-hidden min-h-[100dvh]"
 		tabindex="0"
 		role="region"
 		aria-label="Commissions"
 	>
-		<GlitterOverlay count={10} />
 		<CommissionInfo status="open" />
 	</section>
 
 	<!-- Page 2: About Me -->
 	<section
 		data-page="2"
-		class="w-full relative flex flex-col overflow-hidden"
+		class="w-full relative flex flex-col overflow-hidden min-h-[100dvh]"
 		tabindex="0"
 		role="region"
 		aria-label="About Me"
 	>
-		<GlitterOverlay count={8} />
 		<AboutMe />
 	</section>
 </main>

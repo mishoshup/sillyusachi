@@ -1,9 +1,12 @@
 <script lang="ts">
 	import '../app.css';
+	import GlitterOverlay from '$lib/components/GlitterOverlay.svelte';
 	let { children } = $props();
 </script>
 
 <svelte:head>
+	<link rel="preload" href="/AMORIA.woff2" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="/CaviarDreams.woff2" as="font" type="font/woff2" crossorigin>
 	<title>Sillyusachi</title>
 	<meta name="description" content="Sillyusachi (Usachi) — artist and gamer open for commissions. Find my art, socials, and music here." />
 	<meta name="keywords" content="Sillyusachi, Usachi, artist, art commissions, gamer, sillyusachi.com" />
@@ -37,7 +40,18 @@
 </svelte:head>
 
 <div
-	class="h-[100dvh] overflow-hidden bg-gradient-to-br from-[#0a0a1a] via-[#0a0a2a] to-[#0d0d30] bg-cover bg-fixed"
+	class="h-[100dvh] overflow-hidden bg-[#080612] bg-cover bg-fixed"
 >
+	<!-- Single fixed starfield (matching voyager draft template) -->
+	<GlitterOverlay count={300} floatingCount={12} fixed={true} />
+
+	<!-- Atmospheric haze overlays (matching voyager draft template) -->
+	<div
+		class="fixed inset-0 z-0 pointer-events-none"
+		style="background:
+			radial-gradient(ellipse at 20% 50%, rgba(59, 30, 84, 0.5) 0%, transparent 60%),
+			radial-gradient(ellipse at 80% 20%, rgba(30, 60, 114, 0.4) 0%, transparent 50%),
+			radial-gradient(ellipse at 50% 80%, rgba(20, 16, 40, 0.8) 0%, transparent 50%);"
+	></div>
 	{@render children()}
 </div>
