@@ -40,7 +40,7 @@
 </svelte:head>
 
 <div
-	class="h-[100dvh] overflow-hidden bg-[#080612] bg-cover bg-fixed"
+	class="h-[100dvh] bg-[#080612] bg-cover bg-fixed"
 >
 	<!-- Single fixed starfield (matching voyager draft template) -->
 	<GlitterOverlay count={300} floatingCount={12} fixed={true} />

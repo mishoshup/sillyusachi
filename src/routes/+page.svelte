@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { setupLenis } from '$lib/scroll-snap.js';
+	import { setupScrollSnap } from '$lib/scroll-snap.js';
 	import { fly } from 'svelte/transition';
 	import Portfolio from '$lib/components/Portfolio.svelte';
 	import CommissionInfo from '$lib/components/CommissionInfo.svelte';
@@ -46,7 +46,7 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 	onMount(() => {
 		if (!scrollContainer) return;
 		if (audio) audio.volume = volume;
-		const result = setupLenis(scrollContainer, (page) => { currentPage = page; });
+		const result = setupScrollSnap(scrollContainer, (page) => { currentPage = page; });
 		lenisApi = result;
 		return () => result.cleanup();
 	});
@@ -352,13 +352,14 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 <!-- ── Scroll container ────────────────────────────────────────────────────── -->
 <main
 	bind:this={scrollContainer}
-	class="h-[100dvh] w-full"
+	class="h-[100dvh] w-full overflow-y-auto snap-y snap-mandatory"
 	style="touch-action: pan-y;"
 >
 	<!-- Page 0: Portfolio -->
 	<section
 		data-page="0"
-		class="w-full relative flex flex-col overflow-hidden min-h-[100dvh]"
+		class="w-full min-h-[100dvh] relative flex flex-col snap-start"
+		style="scroll-snap-stop: always;"
 		tabindex="0"
 		role="region"
 		aria-label="Portfolio"
@@ -369,7 +370,8 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 	<!-- Page 1: Commissions -->
 	<section
 		data-page="1"
-		class="w-full relative flex flex-col overflow-hidden min-h-[100dvh]"
+		class="w-full min-h-[100dvh] relative flex flex-col snap-start"
+		style="scroll-snap-stop: always;"
 		tabindex="0"
 		role="region"
 		aria-label="Commissions"
@@ -380,7 +382,8 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 	<!-- Page 2: About Me -->
 	<section
 		data-page="2"
-		class="w-full relative flex flex-col overflow-hidden min-h-[100dvh]"
+		class="w-full min-h-[100dvh] relative flex flex-col snap-start"
+		style="scroll-snap-stop: always;"
 		tabindex="0"
 		role="region"
 		aria-label="About Me"

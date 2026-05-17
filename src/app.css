@@ -57,11 +57,25 @@
 @layer base {
 	body {
 		margin: 0;
-		overflow: hidden;
+		/* overflow: hidden; */
 		font-family: 'Caviar Dreams', Arial, sans-serif;
 		background-color: #080612;
 		color: #f0eae8;
 	}
+}
+
+/* ── Scrollbar hiding (global) ──────────────────────────────── */
+* {
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+*::-webkit-scrollbar {
+	display: none;
+}
+
+main {
+	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
 }
 
 /* ── Keyframe animations ─────────────────────────────────────────────────── */
@@ -78,10 +92,6 @@
 
 .floating-element {
 	animation: float 6s ease-in-out infinite;
-}
-
-main::-webkit-scrollbar {
-	display: none;
 }
 
 @keyframes twinkle {

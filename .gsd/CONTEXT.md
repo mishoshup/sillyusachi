@@ -1,82 +1,35 @@
-# Context: Sillyusachi Site — Voyager R1999 Theme Overhaul
+# Context: Sillyusachi Voyager — Enterprise Lenis Scroll Architecture
+
+## Vision
+Fix the completely broken scroll-snap behavior so the site scrolls properly between pages with seamless snap. Use Lenis enterprise-grade as Danial's preferred solution. Handle varied section heights (Portfolio = viewport, CommissionInfo = tall content). Add unit tests in parallel with development.
+
+## Current State
+- Mac has latest commit cd3c5fa using Lenis + Snap library
+- Cannot scroll at all — completely broken
+- Oracle identified 5 specific bugs in current Lenis setup
+- Explorer confirmed overflow-hidden on layout is primary blocker
+- Librarian researched CSS + Vitest setup (reference for testing)
 
 ## Decisions (Locked)
+- Scroll approach: KEEP LENIS — fix it enterprise-grade, not replace
+- Fix the 5 bugs Oracle identified:
+  1. Dual snap points - single start point with mandatory
+  2. wrapper === content - proper wrapper/content separation
+  3. overflow-hidden on layout wrapper - remove it
+  4. Section height measurement race - ensure measurements after layout
+  5. RAF lifecycle race - properly sequence init after Svelte mount
+- Testing: Vitest with jsdom for unit tests
+- Fonts: Keep root-relative URLs
+- Dev: All work on Mac via SSH m4
 
-### Theme
-- **The Voyager from Reverse: 1999** — space alien violinist aesthetic
-- Dark celestial: deep space navy/dark base
-- Retro-futuristic, mysterious, elegant
-- Mixed-media collage feel subtly
+## Agent Discretion (Freedom Areas)
+- Whether to keep Snap library or use manual Lenis snap
+- Lenis config parameters (duration, easing, lerp, etc.)
+- Scrollbar hiding approach
+- Nav tracking implementation (Lenis events vs IntersectionObserver)
+- Test file structure and convention
 
-### Color Palette
-- **Primary:** Shades of blue (deep navy `#0a0a1a`, space blue `#1a3a5c`, soft blue `#7ba7c9`)
-- **Secondary:** White/cream (`#f0eae8`)
-- **Accent:** Gold (`#d4a853`, `#b8953a`)
-- **NO light purple** — remove all `#3a2248`, `#c084fc`, purple tones
-- **DO keep:** dark backgrounds, gold highlights, blue tones
-
-### Typography
-- **Primary display:** Amoria (existing, keep)
-- **Primary body:** Caviar Dreams (existing, keep)
-- **Tertiary (minimal use):** Space Grotesk — for data-rich areas like commission info grid, stats, badges
-- No other new fonts
-
-### Navigation Sidebar
-- Keep **exact same placement and rotation mechanics** as current repo
-- Restyle colors to Voyager theme (dark bg, gold/blue accents)
-- Same CSS structure, just color changes
-
-### Music Player
-- Keep **exact same component structure** (same props, state, functions, layout)
-- Restyle colors and visual design to Voyager dark theme
-- Same track info, progress bar, controls, playlist
-
-### Pages Structure
-- Scroll-snap layout with 3 pages (same as current, add 3rd)
-- **Page 1:** Portfolio (restyled, content mostly same)
-- **Page 2:** Commission Info (new page)
-- **Page 3:** About Me — Voyager themed (new page)
-
-### Portfolio Page (Updated)
-- Same greeting/content but restyled dark
-- Remove existing flower GIF decorative header? Or replace with celestial imagery
-- Social links restyled to match
-- Keep "scroll" hint
-
-### Commission Info Page
-- Section: Gallery (placeholder for now)
-- Section: Pricing
-- Section: Terms of Service
-- Section: Dos & Don'ts
-- Section: Payment methods
-- Section: Commission Status (open/closed badge)
-
-### About Me (Voyager Themed)
-- Online name: Sillyusachi / Usachi
-- Age: 18+
-- Fav song: 754 — Cece Natalie (or configurable)
-- Games played
-- Special interest
-- Birthday: August
-- Quotes (including "my typo" quote)
-- Favourite fictional characters list
-- Location: Malaysia + earth display (CSS rotating globe concept from draft)
-
-### Stars / Particles
-- **Less stars** than draft — sparse, elegant
-- Colors: blue, white, gold only
-- No light purple particles
-- Floating decorative symbols: ✦ ⊹ ˚ ✧ ⋆ (blue/white/gold)
-
-## Deferred
-- Actual gallery images — placeholder for now, Nasuha fills later
-- Interactive 3D earth — CSS rotating globe is enough for now
-- Fonts beyond what's listed — defer new additions
-
-## Agent Discretion
-- Exact layout within pages (cards, grids, glass panels)
-- Starfield density (keep sparse as noted)
-- Specific Tailwind color values within the palette
-- Animation timings and transitions
-- How to handle the earth globe CSS implementation
-- How to structure the info-grid layout for About Me
+## Deferred Ideas (Out of Scope)
+- No mobile-specific nav changes
+- No Cloudflare deployment fixes
+- No new page animations
