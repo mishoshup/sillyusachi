@@ -17,6 +17,6 @@ export default defineConfig({
 		globals: true,
 	},
 	server: {
-		allowedHosts: ['nasuha.cloud-miso.top', 'openclaw-personal.tailf76c68.ts.net']
+		allowedHosts: [true,'nasuha.cloud-miso.top', 'openclaw-personal.tailf76c68.ts.net']
 	}
 });

@@ -23,7 +23,9 @@
 				<circle cx="100" cy="100" r="44" stroke="#d4a853" stroke-width="0.4" opacity="0.15" />
 				<circle cx="100" cy="100" r="30" stroke="#7ba7c9" stroke-width="0.5" opacity="0.3" />
 				<!-- Star center -->
-				<text x="100" y="106" text-anchor="middle" fill="#d4a853" font-size="22" opacity="0.6">✦</text>
+				<text x="100" y="106" text-anchor="middle" fill="#d4a853" font-size="22" opacity="0.6"
+					>✦</text
+				>
 			</svg>
 		</section>
 
@@ -51,7 +53,9 @@
 					href="https://discord.com/users/985572869708869662/"
 					class="flex flex-col items-center gap-2 group"
 				>
-					<div class="transition-transform duration-300 group-hover:-translate-y-1 group-hover:drop-shadow-[0_0_8px_rgba(212,168,83,0.5)]">
+					<div
+						class="transition-transform duration-300 group-hover:-translate-y-1 group-hover:drop-shadow-[0_0_8px_rgba(212,168,83,0.5)]"
+					>
 						<SocialIcons alt="" network="discord" fgColor="#f0eae8" bgColor="#1a3a5c" />
 					</div>
 				</a>
@@ -59,7 +63,9 @@
 					href="https://www.tiktok.com/@sillyusachi"
 					class="flex flex-col items-center gap-2 group"
 				>
-					<div class="transition-transform duration-300 group-hover:-translate-y-1 group-hover:drop-shadow-[0_0_8px_rgba(212,168,83,0.5)]">
+					<div
+						class="transition-transform duration-300 group-hover:-translate-y-1 group-hover:drop-shadow-[0_0_8px_rgba(212,168,83,0.5)]"
+					>
 						<SocialIcons alt="" network="tiktok" fgColor="#f0eae8" bgColor="#1a3a5c" />
 					</div>
 				</a>
@@ -67,12 +73,16 @@
 					href="https://open.spotify.com/user/31y7ew3vvqq7a7rcm4ugw5hjn2ou?si=59d8805cb01c45cc"
 					class="flex flex-col items-center gap-2 group"
 				>
-					<div class="transition-transform duration-300 group-hover:-translate-y-1 group-hover:drop-shadow-[0_0_8px_rgba(212,168,83,0.5)]">
+					<div
+						class="transition-transform duration-300 group-hover:-translate-y-1 group-hover:drop-shadow-[0_0_8px_rgba(212,168,83,0.5)]"
+					>
 						<SocialIcons alt="" network="spotify" fgColor="#f0eae8" bgColor="#1a3a5c" />
 					</div>
 				</a>
 				<a href="https://kirke.social/sillyusachi" class="flex flex-col items-center gap-2 group">
-					<div class="transition-transform duration-300 group-hover:-translate-y-1 group-hover:drop-shadow-[0_0_8px_rgba(212,168,83,0.5)]">
+					<div
+						class="transition-transform duration-300 group-hover:-translate-y-1 group-hover:drop-shadow-[0_0_8px_rgba(212,168,83,0.5)]"
+					>
 						<KirkeIcon fgColor="#f0eae8" bgColor="#1a3a5c" />
 					</div>
 				</a>
@@ -84,7 +94,7 @@
 
 	<!-- Scroll Hint -->
 	<div
-		class="absolute bottom-7 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-0.5 animate-bounce transition-opacity duration-700"
+		class="z-20 flex flex-col items-center gap-0.5 animate-bounce transition-opacity duration-700"
 		style="transition-delay: 480ms"
 	>
 		<span class="font-caviar text-[0.58rem] text-[#8899aa] tracking-[0.18em] uppercase">
@@ -102,4 +112,3 @@
 		background-clip: text;
 	}
 </style>
-

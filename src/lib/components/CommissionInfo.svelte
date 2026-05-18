@@ -8,14 +8,10 @@
 			? 'bg-green-500/10 text-green-400 border-green-500/30'
 			: 'bg-red-500/10 text-red-400 border-red-500/30'
 	);
-	let statusCardBorder = $derived(
-		status === 'open' ? 'border-green-500/20' : 'border-red-500/20'
-	);
+	let statusCardBorder = $derived(status === 'open' ? 'border-green-500/20' : 'border-red-500/20');
 </script>
 
-<div
-	class="relative flex flex-col items-center w-full py-12 px-3 sm:px-6 gap-6"
->
+<div class="relative flex flex-col items-center w-full py-12 px-3 sm:px-6 gap-6">
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-5xl">
 		<!-- 1. Header — full width -->
 		<div class="col-span-1 md:col-span-2 lg:col-span-3 text-center mb-1">
@@ -45,7 +41,9 @@
 		</div>
 
 		<!-- 4. Terms of Service — lg:col-span-2 -->
-		<div class="lg:col-span-2 bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 backdrop-blur-md">
+		<div
+			class="lg:col-span-2 bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 backdrop-blur-md"
+		>
 			<h3 class="font-caviar font-bold uppercase text-[#d4a853] text-xs tracking-[0.12em] mb-3">
 				Terms of Service
 			</h3>
@@ -84,7 +82,9 @@
 			</h3>
 			<div class="grid grid-cols-2 gap-4">
 				<div>
-					<p class="font-caviar text-[#4ade80] text-xs font-bold uppercase tracking-[0.08em] mb-1.5">
+					<p
+						class="font-caviar text-[#4ade80] text-xs font-bold uppercase tracking-[0.08em] mb-1.5"
+					>
 						✅ Do
 					</p>
 					<ul class="font-caviar text-[#8899aa] text-xs leading-relaxed space-y-1">
@@ -94,7 +94,9 @@
 					</ul>
 				</div>
 				<div>
-					<p class="font-caviar text-[#ef4444] text-xs font-bold uppercase tracking-[0.08em] mb-1.5">
+					<p
+						class="font-caviar text-[#ef4444] text-xs font-bold uppercase tracking-[0.08em] mb-1.5"
+					>
 						❌ Don't
 					</p>
 					<ul class="font-caviar text-[#8899aa] text-xs leading-relaxed space-y-1">
@@ -111,7 +113,9 @@
 			<h3 class="font-caviar font-bold uppercase text-[#d4a853] text-xs tracking-[0.12em] mb-2">
 				Payment
 			</h3>
-			<div class="font-caviar text-[#8899aa] text-sm leading-relaxed flex flex-wrap gap-x-3 gap-y-1">
+			<div
+				class="font-caviar text-[#8899aa] text-sm leading-relaxed flex flex-wrap gap-x-3 gap-y-1"
+			>
 				<span>PayPal</span>
 				<span>ShopeePay</span>
 				<span>Touch 'n Go eWallet</span>
@@ -143,16 +147,6 @@
 			</div>
 			<p class="font-caviar text-[#8899aa] text-sm">DM to discuss your idea ✦</p>
 		</div>
-	</div>
-
-	<!-- Scroll hint -->
-	<div
-		class="mt-6 flex flex-col items-center gap-0.5 animate-bounce transition-opacity duration-700"
-	>
-		<span class="font-caviar text-[0.52rem] text-[#8899aa] tracking-[0.18em] uppercase">
-			scroll
-		</span>
-		<span class="text-[#8899aa] text-xs">↓</span>
 	</div>
 </div>
 
