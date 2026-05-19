@@ -28,7 +28,9 @@
 	let ageDescriptor = $derived(`${age} · celestial traveler`);
 </script>
 
-<div class="relative flex flex-col items-center justify-center w-full flex-1 px-4 sm:px-8 py-8 sm:py-12 gap-6 overflow-hidden">
+<div
+	class="relative flex flex-col items-center justify-center w-full flex-1 px-4 sm:px-8 py-8 sm:py-12 gap-6 overflow-hidden"
+>
 	<!-- Header + Quote in a top section -->
 	<div class="text-center z-10">
 		<h2 class="font-amoria gold-gradient-text text-[2.5rem] sm:text-[3.5rem] leading-none">
@@ -38,7 +40,9 @@
 	</div>
 
 	<!-- Main content: globe + info grid side by side on desktop -->
-	<div class="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-10 w-full max-w-3xl z-10">
+	<div
+		class="flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-10 w-full max-w-3xl z-10"
+	>
 		<!-- Left: Globe Column -->
 		<div class="flex flex-col items-center gap-2 shrink-0">
 			<div class="earth-globe" aria-hidden="true"></div>
@@ -46,7 +50,9 @@
 			<span class="font-caviar text-[#8899aa] text-sm">{location}</span>
 
 			<!-- Age descriptor below globe -->
-			<p class="font-caviar text-[#8899aa] text-[0.55rem] uppercase tracking-[0.15em] opacity-50 mt-2">
+			<p
+				class="font-caviar text-[#8899aa] text-[0.55rem] uppercase tracking-[0.15em] opacity-50 mt-2"
+			>
 				{ageDescriptor}
 			</p>
 		</div>

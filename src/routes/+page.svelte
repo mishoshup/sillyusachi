@@ -144,7 +144,7 @@
 		<span class="nav-toggle-icon font-xl">✦</span>
 	</button>
 
-	{#each pageNames as name, i}
+	{#each pageNames as name, i (name)}
 		<button
 			onclick={() => {
 				scrollToPage(i);
@@ -266,7 +266,7 @@
 				<div class="text-[0.58rem] font-bold uppercase tracking-[0.09em] text-[#8899aa] mb-1.5">
 					playlist
 				</div>
-				{#each playlist as track, i}
+				{#each playlist as track, i (track.name)}
 					<button
 						onclick={() => playTrack(i)}
 						class="w-full text-left px-2 py-1.5 rounded-lg flex items-center gap-2.5 hover:bg-[#1a3a5c]/30 transition-colors duration-150 {i ===
@@ -342,7 +342,7 @@
 					</span>
 				</div>
 				<div class="flex items-end gap-[2px] h-3 ml-0.5" aria-hidden="true">
-					{#each [750, 550, 850] as delay}
+					{#each [750, 550, 850] as delay (delay)}
 						<span
 							class="w-[2.5px] rounded-[2px] bg-gradient-to-t from-[#7ba7c9] to-[#d4a853] transition-all duration-300 {!isPaused
 								? 'animate-bounce'

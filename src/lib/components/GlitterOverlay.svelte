@@ -60,7 +60,7 @@
 
 <div
 	class="pointer-events-none overflow-hidden select-none z-0"
-	class:fixed={fixed}
+	class:fixed
 	class:absolute={!fixed}
 	class:inset-0={true}
 >
@@ -90,8 +90,8 @@
 				color: {f.color};
 				animation-delay: {f.delay}s;
 				animation-duration: {f.duration}s;
-			"
-		>{f.char}</span>
+			">{f.char}</span
+		>
 	{/each}
 </div>
 
@@ -122,7 +122,8 @@
 	}
 
 	@keyframes twinkle {
-		0%, 100% {
+		0%,
+		100% {
 			opacity: 0.1;
 			transform: scale(0.5);
 		}
@@ -133,7 +134,8 @@
 	}
 
 	@keyframes floatStar {
-		0%, 100% {
+		0%,
+		100% {
 			transform: translateY(0) rotate(0deg);
 		}
 		50% {

@@ -5,18 +5,14 @@ import { defineConfig } from 'vitest/config';
 import { svelteTesting } from '@testing-library/svelte/vite';
 
 export default defineConfig({
-	plugins: [
-		sveltekit(),
-		tailwindcss(),
-		...(process.env.VITEST ? [svelteTesting()] : []),
-	],
+	plugins: [sveltekit(), tailwindcss(), ...(process.env.VITEST ? [svelteTesting()] : [])],
 	test: {
 		environment: 'jsdom',
 		setupFiles: ['./vitest-setup.js'],
 		include: ['src/**/*.{test,spec}.{js,ts}'],
-		globals: true,
+		globals: true
 	},
 	server: {
-		allowedHosts: [true,'nasuha.cloud-miso.top', 'openclaw-personal.tailf76c68.ts.net']
+		allowedHosts: [true, 'nasuha.cloud-miso.top', 'openclaw-personal.tailf76c68.ts.net']
 	}
 });
