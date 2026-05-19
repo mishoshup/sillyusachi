@@ -4,7 +4,7 @@
 	import { fly } from 'svelte/transition';
 	import Portfolio from '$lib/components/Portfolio.svelte';
 	import CommissionInfo from '$lib/components/CommissionInfo.svelte';
-import AboutMe from '$lib/components/AboutMe.svelte';
+	import AboutMe from '$lib/components/AboutMe.svelte';
 	import { Play, Pause, SkipForward, SkipBack, Volume2, VolumeX } from '@lucide/svelte';
 	import Cece754 from '$lib/music/754.mp3';
 	import Roommates from '$lib/music/roommates.mp3';
@@ -36,7 +36,8 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 	// ── Navigation ────────────────────────────────────────────────────────────
 	let scrollContainer: HTMLElement | undefined = $state();
 	let currentPage = $state(0);
-	let lenisApi: { cleanup: () => void; scrollToPage: (index: number) => void } | null = $state(null);
+	let lenisApi: { cleanup: () => void; scrollToPage: (index: number) => void } | null =
+		$state(null);
 	let navExpanded = $state(false);
 	const pageNames = ['Portfolio', 'Commissions', 'About Me'];
 	const tabColors = ['#7ba7c9', '#d4a853', '#5a8ab5'];
@@ -46,7 +47,9 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 	onMount(() => {
 		if (!scrollContainer) return;
 		if (audio) audio.volume = volume;
-		const result = setupScrollSnap(scrollContainer, (page) => { currentPage = page; });
+		const result = setupScrollSnap(scrollContainer, (page) => {
+			currentPage = page;
+		});
 		lenisApi = result;
 		return () => result.cleanup();
 	});
@@ -127,7 +130,10 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 ></audio>
 
 <!-- ── Navigation tabs ─────────────────────────────────────────────────────── -->
-<nav class="fixed left-0 top-8 z-50 flex flex-col gap-2 {navExpanded ? 'nav-expanded' : ''}" style="contain: layout style;">
+<nav
+	class="fixed left-0 top-8 z-50 flex flex-col gap-2 {navExpanded ? 'nav-expanded' : ''}"
+	style="contain: layout style;"
+>
 	<!-- Master toggle — always on top -->
 	<button
 		onclick={() => (navExpanded = !navExpanded)}
@@ -146,10 +152,11 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 			}}
 			aria-label="Go to {name}"
 			class="nav-tab {i === currentPage ? 'active' : ''}"
-			style="--rot: {tabRotations[i % tabRotations.length]}deg; --bg: {tabColors[
+			style="--rot: {tabRotations[i % tabRotations.length]}deg; --dot-color: {tabColors[
 				i % tabColors.length
 			]};"
 		>
+			<span class="tab-dot" style="background: {tabColors[i % tabColors.length]};"></span>
 			<span class="tab-label">{name}</span>
 			<span class="tab-icon font-xl">{tabIcons[i % tabIcons.length]}</span>
 		</button>
@@ -397,43 +404,60 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: 6px;
-		padding: 7px 10px 7px 12px;
+		gap: 8px;
+		padding: 8px 12px 8px 10px;
 		border-radius: 0 14px 14px 0;
-		border: 1px solid rgba(255, 255, 255, 0.65);
+		border: 1px solid rgba(255, 255, 255, 0.4);
 		border-left: none;
-		background: var(--bg);
-		backdrop-filter: blur(10px);
+		background: rgba(85, 75, 150, 0.15);
+		backdrop-filter: blur(12px);
 		transform: rotate(var(--rot)) translateX(calc(-100% + 26px));
 		transition:
 			transform 0.6s cubic-bezier(0.4, 1.5, 0.68, 1),
 			box-shadow 0.5s ease,
-			opacity 0.5s ease;
+			opacity 0.5s ease,
+			background 0.3s ease,
+			border-color 0.3s ease;
 		opacity: 0.75;
-		box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.2);
+		box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.3);
 		cursor: pointer;
 	}
 	@media (hover: hover) {
 		.nav-tab:hover {
 			transform: rotate(var(--rot)) translateX(0px);
 			opacity: 1;
+			background: rgba(212, 168, 83, 0.15);
+			border-color: rgba(212, 168, 83, 0.3);
 			box-shadow:
-				2px 2px 20px rgba(212, 168, 83, 0.15),
-				inset 0 1px 0 rgba(255, 255, 255, 0.35);
+				2px 2px 20px rgba(212, 168, 83, 0.12),
+				inset 0 1px 0 rgba(255, 255, 255, 0.1);
 		}
 	}
 	.nav-tab.active {
 		transform: rotate(var(--rot)) translateX(0px);
 		opacity: 1;
+		background: rgba(212, 168, 83, 0.12);
+		border-color: rgba(212, 168, 83, 0.35);
 		box-shadow:
 			2px 2px 20px rgba(212, 168, 83, 0.15),
-			inset 0 1px 0 rgba(255, 255, 255, 0.35);
+			inset 0 1px 0 rgba(255, 255, 255, 0.1);
 	}
 	.tab-icon {
 		font-size: 0.8rem;
 		color: #f0eae8;
 		line-height: 1;
 		flex-shrink: 0;
+	}
+	.tab-dot {
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		flex-shrink: 0;
+		box-shadow: 0 0 4px var(--dot-color);
+		transition: box-shadow 0.3s ease;
+	}
+	.nav-tab.active .tab-dot {
+		box-shadow: 0 0 8px var(--dot-color);
 	}
 	.tab-label {
 		font-family: var(--font-caviar);
@@ -452,47 +476,40 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 		width: 26px;
 		height: 34px;
 		border-radius: 0 13px 13px 0;
-		border: 1px solid rgba(255, 255, 255, 0.72);
+		border: 1px solid rgba(255, 255, 255, 0.4);
 		border-left: none;
-		background: linear-gradient(160deg, #1a3a5c, #0a0a2a);
-		background-size: 300% 300%;
+		background: rgba(85, 75, 150, 0.15);
 		backdrop-filter: blur(12px);
 		transform: translateX(0);
-		opacity: 0.85;
+		opacity: 0.75;
 		box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
 		cursor: pointer;
 		transition:
 			opacity 0.3s ease,
-			box-shadow 0.3s ease;
+			box-shadow 0.3s ease,
+			background 0.3s ease,
+			border-color 0.3s ease;
 	}
 	@media (hover: hover) {
 		.nav-toggle:hover {
 			opacity: 1;
-			animation: toggle-shimmer 5s ease infinite;
+			background: rgba(212, 168, 83, 0.12);
+			border-color: rgba(212, 168, 83, 0.3);
 			box-shadow:
-				3px 4px 18px rgba(212, 168, 83, 0.25),
-				inset 0 1px 0 rgba(255, 255, 255, 0.6);
+				3px 4px 18px rgba(212, 168, 83, 0.2),
+				inset 0 1px 0 rgba(255, 255, 255, 0.1);
 		}
 	}
 	.nav-toggle.expanded {
 		opacity: 1;
-		animation: toggle-shimmer 5s ease infinite;
+		background: rgba(212, 168, 83, 0.15);
+		border-color: rgba(212, 168, 83, 0.35);
 		box-shadow:
-			3px 4px 22px rgba(212, 168, 83, 0.3),
-			0 0 14px rgba(123, 167, 201, 0.25),
-			inset 0 1px 0 rgba(255, 255, 255, 0.6);
+			3px 4px 22px rgba(212, 168, 83, 0.25),
+			0 0 14px rgba(123, 167, 201, 0.15),
+			inset 0 1px 0 rgba(255, 255, 255, 0.1);
 	}
-	@keyframes toggle-shimmer {
-		0% {
-			background-position: 0% 50%;
-		}
-		50% {
-			background-position: 100% 50%;
-		}
-		100% {
-			background-position: 0% 50%;
-		}
-	}
+
 	.nav-toggle-icon {
 		font-size: 1rem;
 		color: #f0eae8;
@@ -507,11 +524,13 @@ import AboutMe from '$lib/components/AboutMe.svelte';
 	.nav-expanded .nav-tab {
 		transform: rotate(var(--rot)) translateX(0px);
 		opacity: 1;
+		background: rgba(85, 75, 150, 0.12);
+		border-color: rgba(255, 255, 255, 0.3);
 		box-shadow:
-			3px 3px 18px rgba(0, 0, 0, 0.13),
-			inset 0 1px 0 rgba(255, 255, 255, 0.55);
+			3px 3px 18px rgba(0, 0, 0, 0.2),
+			inset 0 1px 0 rgba(255, 255, 255, 0.08);
 	}
-main::-webkit-scrollbar {
-  display: none;
-}
+	main::-webkit-scrollbar {
+		display: none;
+	}
 </style>

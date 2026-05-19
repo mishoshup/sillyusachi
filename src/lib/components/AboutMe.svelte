@@ -28,7 +28,7 @@
 	let ageDescriptor = $derived(`${age} · celestial traveler`);
 </script>
 
-<div class="relative flex flex-col items-center justify-center w-full h-full py-8 sm:py-12 px-4 sm:px-8 gap-6 overflow-hidden">
+<div class="relative flex flex-col items-center justify-center w-full flex-1 px-4 sm:px-8 py-8 sm:py-12 gap-6 overflow-hidden">
 	<!-- Header + Quote in a top section -->
 	<div class="text-center z-10">
 		<h2 class="font-amoria gold-gradient-text text-[2.5rem] sm:text-[3.5rem] leading-none">

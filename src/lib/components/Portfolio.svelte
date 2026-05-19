@@ -5,7 +5,7 @@
 </script>
 
 <div
-	class="relative flex flex-col justify-center items-center w-full h-full py-8 sm:py-12 px-4 text-center gap-4 overflow-hidden"
+	class="relative flex flex-col justify-center items-center w-full flex-1 px-4 py-8 sm:py-12 text-center overflow-hidden"
 >
 	<!-- Content -->
 	<div class="relative z-10 flex flex-col items-center gap-4 max-w-2xl w-full">
@@ -94,7 +94,7 @@
 
 	<!-- Scroll Hint -->
 	<div
-		class="z-20 flex flex-col items-center gap-0.5 animate-bounce transition-opacity duration-700"
+		class="absolute bottom-6 left-0 right-0 z-20 flex flex-col items-center gap-0.5 animate-bounce transition-opacity duration-700"
 		style="transition-delay: 480ms"
 	>
 		<span class="font-caviar text-[0.58rem] text-[#8899aa] tracking-[0.18em] uppercase">

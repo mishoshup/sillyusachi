@@ -11,7 +11,7 @@
 	let statusCardBorder = $derived(status === 'open' ? 'border-green-500/20' : 'border-red-500/20');
 </script>
 
-<div class="relative flex flex-col items-center w-full py-12 px-3 sm:px-6 gap-6">
+<div class="relative flex flex-col justify-center items-center w-full flex-1 px-3 sm:px-6 py-8 sm:py-12 gap-6">
 	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-5xl">
 		<!-- 1. Header — full width -->
 		<div class="col-span-1 md:col-span-2 lg:col-span-3 text-center mb-1">
