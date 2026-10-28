@@ -1,0 +1,33 @@
+{
+	"$schema": "https://docs.renovatebot.com/renovate-schema.json",
+	"extends": ["config:best-practices", "schedule:weekly"],
+	"timezone": "Asia/Kuala_Lumpur",
+	"rangeStrategy": "pin",
+	"packageRules": [
+		{
+			"description": "Group Cloudflare tooling so wrangler, workers types and the vitest pool move together",
+			"matchPackageNames": ["wrangler", "@cloudflare/**"],
+			"groupName": "cloudflare"
+		},
+		{
+			"description": "Group lint and format tooling",
+			"matchPackageNames": [
+				"eslint",
+				"@eslint/**",
+				"eslint-*",
+				"@eslint-react/**",
+				"astro-eslint-parser",
+				"typescript-eslint",
+				"globals",
+				"prettier",
+				"prettier-plugin-*"
+			],
+			"groupName": "lint and format"
+		},
+		{
+			"description": "Automerge non-major updates once CI passes",
+			"matchUpdateTypes": ["minor", "patch", "digest"],
+			"automerge": true
+		}
+	]
+}

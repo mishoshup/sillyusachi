@@ -1,0 +1,73 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "sillyusachi-api",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-10-26",
+	"workers_dev": false,
+	"preview_urls": false,
+	"observability": { "enabled": true },
+	"cache": { "enabled": true },
+	"vars": {
+		"JWT_ISSUER": "sillyusachi-api",
+		"JWT_AUDIENCE": "sillyusachi-web",
+		"SESSION_TTL_SECONDS": 43200,
+		"ARGON2_MEMORY_KIB": 19456,
+		"ARGON2_TIME_COST": 2,
+		"MAX_TITLE_LENGTH": 120,
+		"MAX_BODY_LENGTH": 5000,
+		"MAX_UPLOAD_BYTES": 10485760,
+		"MAX_JSON_BYTES": 65536,
+		"PUBLIC_CACHE_SECONDS": 60,
+	},
+	"secrets": {
+		"required": ["JWT_PRIVATE_JWK", "JWT_PUBLIC_JWKS", "PASSWORD_PEPPER"],
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "sillyusachi",
+			"database_id": "df009b3f-ddce-41c7-aedb-e711b72f9f24",
+			"migrations_dir": "migrations",
+		},
+	],
+	"r2_buckets": [{ "binding": "PHOTOS", "bucket_name": "sillyusachi-photos" }],
+	"ratelimits": [
+		{ "name": "LOGIN_LIMITER", "namespace_id": "1001", "simple": { "limit": 5, "period": 60 } },
+	],
+	"env": {
+		"staging": {
+			"name": "sillyusachi-api-staging",
+			"cache": { "enabled": true },
+			"vars": {
+				"JWT_ISSUER": "sillyusachi-api-staging",
+				"JWT_AUDIENCE": "sillyusachi-web-staging",
+				"SESSION_TTL_SECONDS": 43200,
+				"ARGON2_MEMORY_KIB": 19456,
+				"ARGON2_TIME_COST": 2,
+				"MAX_TITLE_LENGTH": 120,
+				"MAX_BODY_LENGTH": 5000,
+				"MAX_UPLOAD_BYTES": 10485760,
+				"MAX_JSON_BYTES": 65536,
+				"PUBLIC_CACHE_SECONDS": 60,
+			},
+			"secrets": {
+				"required": ["JWT_PRIVATE_JWK", "JWT_PUBLIC_JWKS", "PASSWORD_PEPPER"],
+			},
+			"d1_databases": [
+				{
+					"binding": "DB",
+					"database_name": "sillyusachi-staging",
+					"migrations_dir": "migrations",
+				},
+			],
+			"r2_buckets": [{ "binding": "PHOTOS", "bucket_name": "sillyusachi-photos-staging" }],
+			"ratelimits": [
+				{
+					"name": "LOGIN_LIMITER",
+					"namespace_id": "1002",
+					"simple": { "limit": 5, "period": 60 },
+				},
+			],
+		},
+	},
+}

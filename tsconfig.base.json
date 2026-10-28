@@ -1,0 +1,29 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig",
+	"compilerOptions": {
+		"target": "ES2024",
+		"lib": ["ES2024"],
+		"module": "Preserve",
+		"moduleResolution": "Bundler",
+		"moduleDetection": "force",
+		"noEmit": true,
+		"allowImportingTsExtensions": true,
+		"verbatimModuleSyntax": true,
+		"isolatedModules": true,
+		"erasableSyntaxOnly": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		"exactOptionalPropertyTypes": true,
+		"noImplicitOverride": true,
+		"noImplicitReturns": true,
+		"noFallthroughCasesInSwitch": true,
+		"noPropertyAccessFromIndexSignature": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"allowUnreachableCode": false,
+		"allowUnusedLabels": false,
+		"forceConsistentCasingInFileNames": true
+	}
+}

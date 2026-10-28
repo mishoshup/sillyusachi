@@ -1,0 +1,29 @@
+---
+import { personJsonLd } from '../seo/person-json-ld.ts';
+import { SITE_KEYWORDS, SITE_NAME, SOCIAL_DESCRIPTION } from '../seo/site.ts';
+
+interface Props {
+	description: string;
+	title: string;
+}
+
+const { description, title } = Astro.props;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+---
+
+<title>{title}</title>
+<meta content={description} name="description" />
+<meta content={SITE_KEYWORDS} name="keywords" />
+<link href={canonicalUrl} rel="canonical" />
+
+<meta content="website" property="og:type" />
+<meta content={canonicalUrl} property="og:url" />
+<meta content={title} property="og:title" />
+<meta content={SOCIAL_DESCRIPTION} property="og:description" />
+<meta content={SITE_NAME} property="og:site_name" />
+
+<meta content="summary" name="twitter:card" />
+<meta content={title} name="twitter:title" />
+<meta content={SOCIAL_DESCRIPTION} name="twitter:description" />
+
+<script is:inline set:html={personJsonLd()} type="application/ld+json" />

@@ -1,0 +1,102 @@
+---
+import '@fontsource/silkscreen/400.css';
+import '@fontsource/silkscreen/700.css';
+
+import SeoHead from '../components/SeoHead.astro';
+import '../styles/global.css';
+
+interface Props {
+	description: string;
+	title: string;
+}
+
+const { description, title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta content="width=device-width, initial-scale=1" name="viewport" />
+		<meta content="scale" name="text-scale" />
+		<link as="font" crossorigin href="/CaviarDreams.woff2" rel="preload" type="font/woff2" />
+		<link as="font" crossorigin href="/CaviarDreams_Bold.woff2" rel="preload" type="font/woff2" />
+		<link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+		<SeoHead description={description} title={title} />
+	</head>
+	<body>
+		<main class="window">
+			<header class="window-bar">
+				<a aria-label="Home" class="close-box" href="/">
+					<svg aria-hidden="true" viewBox="0 0 24 24">
+						<path d="M4 4 20 20M20 4 4 20" />
+					</svg>
+				</a>
+				<p class="address">sillyusachi.com</p>
+			</header>
+			<div class="window-body">
+				<slot />
+			</div>
+		</main>
+	</body>
+</html>
+
+<style>
+	.window {
+		background: var(--frame);
+		border-radius: 0.5rem;
+		display: grid;
+		gap: var(--frame-width);
+		grid-template-rows: auto 1fr;
+		margin: clamp(2rem, 18vh, 14rem) auto 4rem;
+		max-width: 56rem;
+		min-height: min(42rem, 70vh);
+		padding: var(--frame-width);
+		width: calc(100% - 2rem);
+	}
+
+	.window-bar {
+		display: grid;
+		gap: var(--frame-width);
+		grid-template-columns: auto 1fr;
+	}
+
+	.close-box {
+		align-items: center;
+		aspect-ratio: 1;
+		background: var(--paper);
+		display: flex;
+		justify-content: center;
+		width: clamp(3rem, 9vw, 5.5rem);
+	}
+
+	.close-box svg {
+		fill: none;
+		stroke: var(--frame);
+		stroke-linecap: square;
+		stroke-width: 4;
+		width: 60%;
+	}
+
+	.close-box:focus-visible {
+		outline: 3px solid var(--ink);
+		outline-offset: -6px;
+	}
+
+	.address {
+		align-items: center;
+		background: var(--paper);
+		color: var(--address);
+		display: flex;
+		font-family: var(--pixel);
+		font-size: clamp(0.9rem, 2.6vw, 1.5rem);
+		letter-spacing: 0.35em;
+		margin: 0;
+		padding-inline: 1.5rem;
+	}
+
+	.window-body {
+		background: var(--paper);
+		padding: clamp(1rem, 4vw, 2rem) clamp(1rem, 8vw, 4.5rem);
+	}
+</style>

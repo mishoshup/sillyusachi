@@ -1,0 +1,59 @@
+---
+import BookCover from '../components/BookCover.astro';
+import WindowLayout from '../layouts/WindowLayout.astro';
+import { SITE_DESCRIPTION, SITE_NAME } from '../seo/site.ts';
+import { listBooks } from '../server/list-books.ts';
+
+const books = await listBooks(Astro.url.origin);
+---
+
+<WindowLayout description={SITE_DESCRIPTION} title={SITE_NAME}>
+	<div class="toolbar">
+		<svg aria-hidden="true" class="sun" viewBox="0 0 24 24">
+			<circle cx="12" cy="12" r="4" />
+			<path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1" />
+		</svg>
+	</div>
+	<h1 class="visually-hidden">bookshelf</h1>
+	<ul class="shelf">
+		{books.map((book) => (
+			<li>
+				<BookCover book={book} />
+			</li>
+		))}
+	</ul>
+</WindowLayout>
+
+<style>
+	.toolbar {
+		align-items: center;
+		display: flex;
+		gap: 0.75rem;
+		margin-bottom: 1.5rem;
+	}
+
+	.sun {
+		fill: none;
+		stroke: var(--muted);
+		stroke-linecap: round;
+		stroke-width: 1.5;
+		width: 1rem;
+	}
+
+	.shelf {
+		display: grid;
+		gap: clamp(1rem, 3vw, 1.75rem) clamp(0.75rem, 2.5vw, 1.5rem);
+		grid-template-columns: repeat(5, minmax(0, 1fr));
+		list-style: none;
+		margin: 0 auto;
+		padding: 0;
+		width: min(100%, max(24rem, calc(140dvh - 37.5rem)));
+	}
+
+	@media (width < 36rem) {
+		.shelf {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			width: 100%;
+		}
+	}
+</style>

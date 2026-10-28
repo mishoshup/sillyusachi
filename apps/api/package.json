@@ -1,0 +1,28 @@
+{
+	"name": "api",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"dev": "wrangler dev --port 8787",
+		"deploy": "wrangler deploy",
+		"check": "wrangler types --strict-vars false && tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
+		"test": "vitest run",
+		"db:migrate": "wrangler d1 migrations apply sillyusachi --local",
+		"keys:dev": "bun scripts/gen-keys.ts",
+		"user:create": "bun scripts/create-user.ts"
+	},
+	"dependencies": {
+		"@hono/standard-validator": "0.4.1",
+		"@phi-ag/argon2": "0.6.2",
+		"@sillyusachi/shared": "workspace:*",
+		"hono": "^4.13.14",
+		"zod": "4.6.7"
+	},
+	"devDependencies": {
+		"@cloudflare/vitest-plugin": "^1.4.9",
+		"@types/node": "24",
+		"typescript": "6.0.3",
+		"vitest": "5.0.5",
+		"wrangler": "^4.154.0"
+	}
+}

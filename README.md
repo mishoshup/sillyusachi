@@ -1,42 +1,27 @@
-# sv
+# sillyusachi
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Sillyusachi's bookshelf site, running on Cloudflare Workers.
 
-## Creating a project
+- `apps/web`: Astro front end (worker `sillyusachi`, serving sillyusachi.com), which reaches the API through the `API` service binding.
+- `apps/api`: Hono API (worker `sillyusachi-api`, private) backed by D1 and R2.
+- `packages/shared`: types shared by both apps.
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Setup
 
-```sh
-# create a new project
-npx sv create my-app
-```
-
-To recreate this project with the same configuration:
+Requires Node 24 (pinned in `mise.toml`) and bun.
 
 ```sh
-# recreate this project
-npx sv@0.15.1 create --template demo --types ts --add eslint prettier --install npm .
+bun install
+bun run --filter api keys:dev   # writes apps/api/.dev.vars (gitignored)
+bun run db:migrate              # applies migrations to the local D1
 ```
 
-## Developing
+## Scripts
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+| Script                 | Purpose                                    |
+| ---------------------- | ------------------------------------------ |
+| `bun run dev`          | Runs the web (4321) and API (8787) workers |
+| `bun run check`        | Generates worker types and type-checks     |
+| `bun run test`         | Runs the API tests                         |
+| `bun run lint`         | Runs ESLint                                |
+| `bun run format:check` | Checks Prettier formatting                 |
